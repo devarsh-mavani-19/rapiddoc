@@ -1,0 +1,47 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.jayshreegopalapps.imagetopdf.MainActivity">
+
+    <item
+        android:id="@+id/action_search"
+        app:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:title="Search"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_more"
+        android:icon="@drawable/ic_more_vert_black_24dp"
+        android:title="Create Folder"
+        app:showAsAction="always" ><menu>
+
+        <item
+            android:id="@+id/action_rename_folder"
+            android:icon="@drawable/ic_create_new_folder_black_24dp"
+            android:title="Rename Folder"
+            android:enabled="false"
+            app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_create_folder"
+        android:icon="@drawable/ic_create_new_folder_black_24dp"
+        android:title="Create Folder"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_import_gallery"
+        android:icon="@drawable/ic_image_black_24dp"
+
+        android:title="Import From Gallery"
+        app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_recycler_mode"
+            android:icon="@drawable/ic_sort_black_24dp"
+            android:title="Grid View"
+            app:showAsAction="never" />
+
+</menu>
+    </item>
+</menu>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/inside_folder_action_more"
+        android:icon="@drawable/ic_more_vert_black_24dp"
+        android:title="Create Folder"
+        app:showAsAction="always" ><menu>
+
+        <item
+            android:id="@+id/inside_folder_rename_dir"
+            android:icon="@drawable/ic_create_new_folder_black_24dp"
+            android:title="Rename Folder"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/inside_folder_share_images"
+            android:icon="@drawable/ic_share_black_24dp2"
+            android:title="Share Images"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/inside_folder_share_as_pdf"
+            android:icon="@drawable/ic_image_black_24dp"
+            android:title="Share as PDF"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/inside_folder_import_from_gallery"
+            android:icon="@drawable/ic_import_export_black_24dp"
+            android:title="Import images from gallery"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/inside_folder_export_to_gallery"
+            android:icon="@drawable/ic_import_export_black_24dp"
+            android:title="Save in gallery"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/inside_folder_move"
+            android:icon="@drawable/ic_content_cut_black_24dp"
+            android:title="cut"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/inside_folder_copy"
+            android:icon="@drawable/ic_content_copy_black_24dp"
+            android:title="copy"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/inside_folder_delete"
+            android:icon="@drawable/ic_delete_black_24dp2"
+            android:title="delete"
+            app:showAsAction="never" />
+
+
+    </menu>
+    </item>
+</menu>

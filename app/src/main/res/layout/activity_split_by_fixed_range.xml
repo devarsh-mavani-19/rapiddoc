@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SplitByFixedRangeActivity">
+
+    <com.google.android.gms.ads.AdView
+        ads:layout_constraintTop_toTopOf="parent"
+        ads:layout_constraintLeft_toLeftOf="parent"
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/ad_banner_split_by_range"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-4411531601838575/9821986957">
+    </com.google.android.gms.ads.AdView>
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/fixed_range_split"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Split every number of pages"
+        android:layout_margin="50dp"
+        android:inputType="number"
+        app:layout_constraintTop_toBottomOf="@+id/ad_banner_split_by_range"
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
+    <LinearLayout
+        app:layout_constraintTop_toBottomOf="@+id/fixed_range_split"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <Button
+        android:id="@+id/button_fixed_range_done"
+        android:text="Split"
+        android:background="@color/colorPRed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_margin="20dp"
+        android:textColor="#fff"
+        />
+        <Button
+            android:id="@+id/button_fixed_range_select_pdf"
+            android:text="Select PDF"
+            android:background="@color/colorPRed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="20dp"
+            android:textColor="#fff"
+            />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

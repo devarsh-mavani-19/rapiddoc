@@ -1,0 +1,41 @@
+{
+  "project_info": {
+    "project_number": "502488181909",
+    "firebase_url": "https://image-and-pdf-tools.firebaseio.com",
+    "project_id": "image-and-pdf-tools",
+    "storage_bucket": "image-and-pdf-tools.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:502488181909:android:bc759acefeb61964c43f9c",
+        "android_client_info": {
+          "package_name": "com.jayshreegopalapps.imagetopdf"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "502488181909-hq47k232gbe9a4easi7v5igqpkfe9h09.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3aE8kfFrYVn4-cHSwBw5xIWfg8cxV3b8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "502488181909-hq47k232gbe9a4easi7v5igqpkfe9h09.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-4411531601838575~6354155868"
+    }
+  ],
+  "configuration_version": "1"
+}

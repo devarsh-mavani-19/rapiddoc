@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_share1"
+        android:icon="@drawable/ic_share_black_24dp"
+        android:title="Save to gallery" />
+
+    <item
+        android:id="@+id/navigation_copy1"
+        android:icon="@drawable/ic_content_copy_black_24dp"
+        android:title="Copy" />
+
+    <item
+        android:id="@+id/navigation_cut1"
+        android:icon="@drawable/ic_content_cut_black_24dp"
+        android:title="Cut" />
+    <item
+        android:id="@+id/navigation_delete1"
+        android:icon="@drawable/ic_delete_black_24dp"
+        android:title="delete" />
+    <item
+        android:id="@+id/naviagtion_more1"
+        android:icon="@drawable/ic_more_vert_black_24dp"
+        android:title="More"
+        />
+
+</menu>
