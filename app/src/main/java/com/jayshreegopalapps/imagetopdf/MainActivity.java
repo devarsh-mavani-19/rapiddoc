@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     Toolbar toolbar;
     CheckBox check;
     private RecyclerView recyclerView;
-    private FloatingActionButton fab, fab2;
+    private FloatingActionButton fab, fab2, fab3;
     LinearLayout bottomNavigationView;
     ArrayList<FileDetailsModel> arrayList = new ArrayList<>();
     RecycleAdapter recycleAdapter;
@@ -185,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 final Chip split_by_fixed_range_ = a.findViewById(R.id.split_by_fixed_range);
                 final Chip compress_pdf_ = a.findViewById(R.id.compress_pdf);
 
+
                 pdf_merge_.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -236,6 +237,13 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             public boolean onLongClick(View v) {
                 Toast.makeText(MainActivity.this, "PDF Tools", Toast.LENGTH_SHORT).show();
                 return false;
+            }
+        });
+        fab3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), QRCodeScannerActivity.class);
+                startActivity(i);
             }
         });
     }
@@ -314,6 +322,7 @@ public void prepareAd() {
         recyclerView = findViewById(R.id.folders_grid_content_main);
         fab = findViewById(R.id.fab);
         fab2 = findViewById(R.id.fab_pdf);
+        fab3 = findViewById(R.id.fab_qr);
         toolbar = findViewById(R.id.toolbar);
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
         paddingBottomRecyclerView = recyclerView.getPaddingBottom();
@@ -814,10 +823,10 @@ public void prepareAd() {
     protected void onResume() {
         super.onResume();
         resetLayoutToDefault();
-        if (prefs.getBoolean("firstrun", true)) {
+        if (prefs.getBoolean("update6", true)) {
             // Do first run stuff here then set 'firstrun' as false
             // using the following line to edit/commit prefs
-            prefs.edit().putBoolean("firstrun", false).commit();
+            prefs.edit().putBoolean("update6", false).commit();
 
 
             FancyShowCaseView fancyShowCaseView1 =new FancyShowCaseView.Builder(this)
@@ -830,6 +839,19 @@ public void prepareAd() {
                             "\n" +
                             "\n"+
                             "Capture Image")
+
+                    .build();
+
+            FancyShowCaseView fancyShowCaseView3 =new FancyShowCaseView.Builder(this)
+                    .focusOn(fab3)
+                    .title(" \n           " +
+                            "\n   " +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n"+
+                            "Scan QR or barcode")
 
                     .build();
 
@@ -846,7 +868,7 @@ public void prepareAd() {
             new FancyShowCaseQueue()
                     .add(fancyShowCaseView1)
                     .add(fancyShowCaseView2)
-                    //.add(fancyShowCaseView3)
+                    .add(fancyShowCaseView3)
                     .show();
             File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
             if (!docsFolder.exists()) {
@@ -888,6 +910,7 @@ public void prepareAd() {
                 else{
                     recycleAdapter.updateDataSet(tempList);
                 }
+                
                 return false;
 
             }

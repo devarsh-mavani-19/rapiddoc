@@ -38,6 +38,15 @@
         app:srcCompat="@drawable/ic_photo_camera_black_24dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_qr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="28dp"
+        android:layout_marginBottom="172dp"
+        app:srcCompat="@drawable/qrcode" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
 
         android:id="@+id/fab_pdf"
         android:layout_width="wrap_content"

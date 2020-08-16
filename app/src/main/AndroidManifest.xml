@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
         android:allowBackup="true"
@@ -16,24 +17,28 @@
         android:roundIcon="@drawable/logo_main"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.jayshreegopalapps.imagetopdf.OpenImageActivity"></activity>
+        <activity android:name=".QRCodeScannerActivity"></activity>
+        <activity android:name=".OpenImageActivity" />
 
+        <meta-data
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="barcode" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-4411531601838575~6354155868" />
 
-        <activity android:name="com.jayshreegopalapps.imagetopdf.SplitByFixedRangeActivity" />
-        <activity android:name="com.jayshreegopalapps.imagetopdf.PDFToolsActivity" />
-        <activity android:name="com.jayshreegopalapps.imagetopdf.SplitPDFActivity" />
-        <activity android:name="com.jayshreegopalapps.imagetopdf.PDFMergeActivity" />
-        <activity android:name="com.jayshreegopalapps.imagetopdf.ViewPDF" />
-        <activity android:name="com.jayshreegopalapps.imagetopdf.NavigateAllFolders" />
+        <activity android:name=".SplitByFixedRangeActivity" />
+        <activity android:name=".PDFToolsActivity" />
+        <activity android:name=".SplitPDFActivity" />
+        <activity android:name=".PDFMergeActivity" />
+        <activity android:name=".ViewPDF" />
+        <activity android:name=".NavigateAllFolders" />
         <activity
-            android:name="com.jayshreegopalapps.imagetopdf.BottomNavigationActivity"
+            android:name=".BottomNavigationActivity"
             android:label="@string/title_activity_bottom_navigation" />
-        <activity android:name="com.jayshreegopalapps.imagetopdf.DatabaseTestActivity" />
-        <activity android:name="com.jayshreegopalapps.imagetopdf.InsideFolderActivtiy" />
-        <activity android:name="com.jayshreegopalapps.imagetopdf.SplashScreen">
+        <activity android:name=".DatabaseTestActivity" />
+        <activity android:name=".InsideFolderActivtiy" />
+        <activity android:name=".SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,7 +46,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.jayshreegopalapps.imagetopdf.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
