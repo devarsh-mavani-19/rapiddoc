@@ -57,26 +57,26 @@ android:layout_gravity="center"
                 app:chipIconTint="@color/colorPrimaryDark"
                 app:chipIconVisible="false"
                 app:chipStrokeColor="@color/colorPrimaryDark"
-                app:rippleColor="@color/colorPOrange"
+                app:rippleColor="@color/colorAccent"
                 />
+
             <com.google.android.material.chip.Chip
-                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:id="@+id/compress_pdf"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
-                app:chipIconTint="@color/colorPrimaryDark"
-                android:layout_marginLeft="10dp"
-                android:gravity="center"
-                app:chipIconVisible="false"
-                app:chipIcon="@drawable/ic_font_download_black_24dp"
-                android:padding="5dp"
-                android:textAlignment="center"
                 android:layout_height="wrap_content"
-                app:rippleColor="@color/colorPOrange"
-                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginLeft="10dp"
                 android:fontFamily="@font/arbutusslabregular"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="watermark"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimaryDark"
                 android:theme="@style/Theme.MaterialComponents.Light"
-                android:text="Compress"
-                />
+                app:chipIcon="@drawable/ic_font_download_black_24dp"
+                app:chipIconTint="@color/colorPrimaryDark"
+                app:chipIconVisible="false"
+                app:rippleColor="@color/colorAccent" />
 
 
         </LinearLayout>
@@ -115,7 +115,7 @@ android:gravity="center"
                 app:chipIconTint="@color/colorPrimaryDark"
                 app:chipIconVisible="false"
                 app:chipStrokeColor="@color/colorPrimaryDark"
-                app:rippleColor="@color/colorPOrange" />
+                app:rippleColor="@color/colorAccent" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -136,7 +136,7 @@ android:gravity="center"
                 app:chipIconTint="@color/colorPrimaryDark"
                 android:textAlignment="center"
                 android:layout_height="wrap_content"
-                app:rippleColor="@color/colorPOrange"
+                app:rippleColor="@color/colorAccent"
                 android:textColor="@color/colorPrimaryDark"
                 android:fontFamily="@font/arbutusslabregular"
                 android:theme="@style/Theme.MaterialComponents.Light"
@@ -158,9 +158,10 @@ android:gravity="center"
                 app:chipIcon="@drawable/ic_call_split_black_24dp"
                 app:chipIconTint="@color/colorPrimaryDark"
                 app:chipIconVisible="false"
-                app:rippleColor="@color/colorPOrange"
+                app:rippleColor="@color/colorAccent"
                 />
         </LinearLayout>
+
 
 </LinearLayout>
 </LinearLayout>

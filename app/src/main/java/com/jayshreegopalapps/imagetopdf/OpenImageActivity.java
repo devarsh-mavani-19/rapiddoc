@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -66,6 +67,7 @@ public class OpenImageActivity extends AppCompatActivity {
             try {
                 FileOutputStream fos = new FileOutputStream(getExternalFilesDir(null) + "/" + fileName);
                 bMap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 finish();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

@@ -3,22 +3,28 @@ package com.jayshreegopalapps.imagetopdf;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,24 +34,26 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.scanlibrary.ScanActivity;
 import com.scanlibrary.ScanConstants;
+import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.Permission;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+
+import me.toptas.fancyshowcase.FancyShowCaseQueue;
+import me.toptas.fancyshowcase.FancyShowCaseView;
 
 public class InsideFolderActivtiy extends AppCompatActivity implements updateUIFromAdapter, RenameBottomModalSheet.BottomSheetListener {
     RecyclerView recyclerView;
@@ -57,7 +65,7 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
     int imageCountOfCurrentFolder;
     DatabaseManagment fileTable;
     boolean isInMultiSelecMode = false;
-    private InterstitialAd interstitialAd;
+//    private InterstitialAd interstitialAd;
 
     @Override
     public void save(String name, String newName) {
@@ -96,26 +104,12 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inside_folder_activtiy);
-        final AdView mAdView = findViewById(R.id.adView_banner_inside_top);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-        mAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdFailedToLoad(int i) {
-                super.onAdFailedToLoad(i);
-                if(i == AdRequest.ERROR_CODE_NETWORK_ERROR) {
-                    Toast.makeText(getApplicationContext(), "Network Error", Toast.LENGTH_SHORT).show();
-                }
-                else if(i == AdRequest.ERROR_CODE_INVALID_REQUEST) {
-                    Toast.makeText(getApplicationContext(), "Invalid Request", Toast.LENGTH_SHORT).show();
-                }
-                else if(i == AdRequest.ERROR_CODE_APP_ID_MISSING) {
-                    Toast.makeText(getApplicationContext(), "App id missing", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        PDFBoxResourceLoader.init(getApplicationContext());
 
-        prepareAd();
+
+
+
+
 
         initViews();
 
@@ -144,7 +138,9 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
             public void onClick(View v) {
 //                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
 //                startActivityForResult(intent, 1);
-
+                if(!askPermissions()) {
+                    return;
+                }
                 int REQUEST_CODE = 1;
                 int preference = ScanConstants.OPEN_CAMERA;
                 Intent intent = new Intent(getApplicationContext(), ScanActivity.class);
@@ -181,8 +177,14 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
         fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ConvertToPDFTask task = new ConvertToPDFTask(InsideFolderActivtiy.this);
-                task.execute(path);
+               if(!askPermissions()){
+               }
+                else{
+                    ConvertToPDFTask task = new ConvertToPDFTask(InsideFolderActivtiy.this);
+                    task.execute(path);
+                }
+
+
             }
         });
         fab3.setOnClickListener(new View.OnClickListener() {
@@ -194,14 +196,19 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
                         share.setType("image/*");
 
                         HashMap<Integer, String> selectedItems = recycleAdapter.getSelectedItems();
-                        ArrayList<Uri> files = new ArrayList<Uri>();
-                        for(Integer i : selectedItems.keySet()) {
-                            String fname = selectedItems.get(i);
-                            files.add(Uri.parse(getExternalFilesDir(null) + "/" + fname));
+                        if(selectedItems.size() == 0) {
+                            Toast.makeText(InsideFolderActivtiy.this, "Please Select at least 1 image", Toast.LENGTH_SHORT).show();
                         }
-                        share.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
-                        startActivity(Intent.createChooser(share, "Share Image"));
-                        setToSingleSelectMode();
+                        else {
+                            ArrayList<Uri> files = new ArrayList<Uri>();
+                            for (Integer i : selectedItems.keySet()) {
+                                String fname = selectedItems.get(i);
+                                files.add(Uri.parse(getExternalFilesDir(null) + "/" + fname));
+                            }
+                            share.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
+                            startActivity(Intent.createChooser(share, "Share Image"));
+                            setToSingleSelectMode();
+                        }
                     }
                     if(operation == multiSelectOperations.COPY_IMAGES) {
                         Intent navIntent = new Intent(getApplicationContext(), NavigateAllFolders.class);
@@ -213,33 +220,117 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
                     }
                     if(operation == multiSelectOperations.DELETE_IMAGES) {
                         HashMap<Integer, String> selectedItems = recycleAdapter.getSelectedItems();
-                        for(Integer i : selectedItems.keySet()) {
-                            fileTable.customQuery("delete from FileDetails where name = '" + selectedItems.get(i) + "'");
+                        if(selectedItems.size() == 0) {
+                            Toast.makeText(InsideFolderActivtiy.this, "Please Select at least 1 image", Toast.LENGTH_SHORT).show();
                         }
-                        Toast.makeText(getApplicationContext(), "Delete Successful", Toast.LENGTH_SHORT).show();
-                        imageCountOfCurrentFolder--;
-                        refreshPage();
+                        else {
+                            for (Integer i : selectedItems.keySet()) {
+                                fileTable.customQuery("delete from FileDetails where name = '" + selectedItems.get(i) + "'");
+                            }
+                            Toast.makeText(getApplicationContext(), "Delete Successful", Toast.LENGTH_SHORT).show();
+                            imageCountOfCurrentFolder--;
+                            refreshPage();
+                        }
                     }
                     if(operation == multiSelectOperations.EXPORT_TO_GALLERY) {
-                        HashMap<Integer, String> selectedItems = recycleAdapter.getSelectedItems();
+                        if(!askPermissions()) {
+                            return;
+                        }
 
-                        for(Integer i : selectedItems.keySet()) {
+                        HashMap<Integer, String> selectedItems = recycleAdapter.getSelectedItems();
+                        if(selectedItems.size() == 0) {
+                            Toast.makeText(InsideFolderActivtiy.this, "Please select at least 1 image", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            for (Integer i : selectedItems.keySet()) {
 //                            ContentValues values = new ContentValues();
 //                            values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
 //                            values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
 //                            values.put(MediaStore.MediaColumns.DATA, (getExternalFilesDir(null) + "/" + selectedItems.get(i)));
 //                            getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
-                            downloadImage(selectedItems.get(i));
+                                downloadImage(selectedItems.get(i));
 
+                            }
+                            Toast.makeText(InsideFolderActivtiy.this, "Saved In Gallery", Toast.LENGTH_SHORT).show();
                         }
-                        Toast.makeText(InsideFolderActivtiy.this, "Saved In Gallery", Toast.LENGTH_SHORT).show();
-
                     }
                 }
             }
         });
 
+    }
+
+    private boolean askPermissions() {
+        if ((ContextCompat.checkSelfPermission(
+                getApplicationContext(), Manifest.permission.CAMERA) !=
+                PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
+                getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
+                getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},10);
+            }
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Permission Granted!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences prefs = getSharedPreferences("com.jayshreegopalapps.ImageToPdf", MODE_PRIVATE);
+        if (prefs.getBoolean("insidefolder8", true)) {
+            // Do first run stuff here then set 'firstrun' as false
+            // using the following line to edit/commit prefs
+            prefs.edit().putBoolean("insidefolder8", false).commit();
+
+
+            FancyShowCaseView fancyShowCaseView1 =new FancyShowCaseView.Builder(this)
+                    .focusOn(fab)
+                    .title(" \n           " +
+                            "\n   " +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n"+
+                            "Capture Image")
+
+                    .build();
+
+
+
+            FancyShowCaseView fancyShowCaseView2 =new FancyShowCaseView.Builder(this)
+                    .focusOn(fab2)
+                    .title("Convert to pdf")
+                    .build()
+                    ;
+           /* new FancyShowCaseView.Builder(this)
+                    .focusOn(getSupportActionBar().getCustomView().findViewById(R.menu.menu_main))
+                    .title("Focus on View")
+                    .build()
+                    .show();*/
+            new FancyShowCaseQueue()
+                    .add(fancyShowCaseView1)
+                    .add(fancyShowCaseView2)
+                    .show();
+            File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
+            if (!docsFolder.exists()) {
+                docsFolder.mkdir();
+            }
+        }
     }
 
     private void downloadImage(String imageName) {
@@ -283,11 +374,7 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
         }
     }
 
-    public void prepareAd() {
-        interstitialAd = new InterstitialAd(getApplicationContext());
-        interstitialAd.setAdUnitId("ca-app-pub-4411531601838575/4167360664");
-        interstitialAd.loadAd(new AdRequest.Builder().build());
-    }
+
 
     @Override
     public void onBackPressed() {
@@ -308,45 +395,45 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
         refreshPage();
     }
 
-    private void initializeBottomMenu() {
-        final ImageView shareMenu, copyMenu, cutMenu, deleteMenu, moreMenu;
-        shareMenu = findViewById(R.id.share_bottom_nav);
-        copyMenu = findViewById(R.id.copy_bottom_nav);
-        cutMenu = findViewById(R.id.cut_bottom_nav);
-        deleteMenu = findViewById(R.id.delete_bottom_nav);
-        moreMenu = findViewById(R.id.more_bottom_nav);
-
-        shareMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        copyMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        cutMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        moreMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popupMenu = new PopupMenu(getApplicationContext(), moreMenu);
-                popupMenu.getMenuInflater().inflate(R.menu.more_pop_up_menu, popupMenu.getMenu());
-                popupMenu.show();
-            }
-        });
-
-    }
+//    private void initializeBottomMenu() {
+//        final ImageView shareMenu, copyMenu, cutMenu, deleteMenu, moreMenu;
+//        shareMenu = findViewById(R.id.share_bottom_nav);
+//        copyMenu = findViewById(R.id.copy_bottom_nav);
+//        cutMenu = findViewById(R.id.cut_bottom_nav);
+//        deleteMenu = findViewById(R.id.delete_bottom_nav);
+//        moreMenu = findViewById(R.id.more_bottom_nav);
+//
+//        shareMenu.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+//
+//        copyMenu.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+//
+//        cutMenu.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+//
+//        moreMenu.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                PopupMenu popupMenu = new PopupMenu(getApplicationContext(), moreMenu);
+//                popupMenu.getMenuInflater().inflate(R.menu.more_pop_up_menu, popupMenu.getMenu());
+//                popupMenu.show();
+//            }
+//        });
+//
+//    }
 
 
     private void extractBundle() {
@@ -368,17 +455,25 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
+
+
         if(id == R.id.inside_folder_share_images) {
             setToMultiSelectMode();
             operation = multiSelectOperations.SHARE_IMAGE;
         }
         if(id == R.id.inside_folder_share_as_pdf) {
+            if(!askPermissions()) {
+                return false;
+            }
             operation = multiSelectOperations.SHARE_PDF;
-            String pdfName = PdfConverter.convertFrom(getApplicationContext(), path);
-            Intent share = new Intent(Intent.ACTION_SEND);
-            share.setType("application/*");
-            share.putExtra(Intent.EXTRA_STREAM, Uri.parse(getExternalFilesDir(null) + "/" + pdfName + ".pdf"));
-            startActivity(Intent.createChooser(share, "Share pdf ..."));
+            ConvertToPDFTaskShare task = new ConvertToPDFTaskShare(InsideFolderActivtiy.this);
+            task.execute(path);
+
+//            String pdfName = PdfConverterBox.convertFrom(getApplicationContext(), path);
+//            Intent share = new Intent(Intent.ACTION_SEND);
+//            share.setType("application/*");
+//            share.putExtra(Intent.EXTRA_STREAM, Uri.parse(Constants.PDF_STORAGE_PATH + pdfName + ".pdf"));
+//            startActivity(Intent.createChooser(share, "Share pdf ..."));
         }
         if(id == R.id.inside_folder_import_from_gallery) {
 
@@ -470,10 +565,9 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        prepareAd();
-        if(interstitialAd.isLoaded()) {
-            interstitialAd.show();
-        }
+//        if(interstitialAd.isLoaded()) {
+//            interstitialAd.show();
+//        }
         if (requestCode == 1) {
             Bitmap image = null;
             if (data != null) {
@@ -769,7 +863,7 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
         refreshPage();
     }
 
-    public class ConvertToPDFTask extends AsyncTask<String, String, Void> {
+    public class ConvertToPDFTask extends AsyncTask<String, String, String> {
         private InsideFolderActivtiy context;
         AlertDialog dialog;
 
@@ -789,16 +883,59 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
         }
 
         @Override
-        protected Void doInBackground(String... strings) {
-            PdfConverter.convertFrom(getApplicationContext(), strings[0]);
-            return null;
+        protected String doInBackground(String... strings) {
+            return PdfConverterBox.convertFrom(getApplicationContext(), strings[0]);
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(String aVoid) {
             dialog.dismiss();
-            Toast.makeText(context, "Saved in " + (getExternalFilesDir(null) + "/" + path), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Saved in " + (Constants.PDF_PATH + aVoid + ".pdf"), Toast.LENGTH_LONG).show();
+            Intent i = new Intent(context, OpenPDFActivity.class);
+            i.setDataAndType(Uri.parse("file:///" + Constants.PDF_PATH + aVoid + ".pdf"), "application/pdf");
+            startActivity(i);
         }
+
+    }
+    public class ConvertToPDFTaskShare extends AsyncTask<String, String, String> {
+        private InsideFolderActivtiy context;
+        AlertDialog dialog;
+
+        ConvertToPDFTaskShare(InsideFolderActivtiy context) {
+            this.context = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setCancelable(false); // if you want user to wait for some process to finish,
+//        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        View view = inflater.inflate(R.layout.activity_main, null);
+            builder.setView(R.layout.layout_loading_dialog);
+            dialog = builder.create();
+            dialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            return PdfConverterBox.convertFrom(getApplicationContext(), strings[0]);
+        }
+
+        @Override
+        protected void onPostExecute(final String aVoid) {
+            dialog.dismiss();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Intent share = new Intent(Intent.ACTION_SEND);
+                    share.setType("application/pdf");
+                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse(Constants.PDF_PATH + aVoid + ".pdf"));
+                    startActivity(Intent.createChooser(share, "Share pdf ..."));
+                }
+            });
+
+        }
+
     }
 
 }

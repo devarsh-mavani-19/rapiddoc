@@ -2,34 +2,66 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
+    android:background="@color/colorPrimary"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/colorPGreen"
-        android:orientation="horizontal"
-        android:padding="15dp">
 
         <ImageButton
             android:id="@+id/selectButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="125dp"
+            android:layout_height="125dp"
+            android:layout_centerHorizontal="true"
             android:layout_gravity="center"
-            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="70dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/gallery" />
+            android:src="@drawable/pick_from_gallery" />
 
-        <ImageButton
-            android:id="@+id/cameraButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:src="@drawable/camera" />
-    </LinearLayout>
+    <TextView
+        android:text="Choose from gallery"
+        android:textColor="#fff"
+        android:padding="20dp"
+        android:gravity="center"
+        android:textSize="20sp"
+
+        android:fontFamily="@font/arbutusslabregular"
+        android:layout_above="@+id/selectButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/open_camera_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cameraButton"
+        android:fontFamily="@font/arbutusslabregular"
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="Open Camera"
+        android:textColor="#fff"
+        android:textSize="20sp" />
+
+    <TextView
+        android:text="OR"
+        android:textColor="#fff"
+        android:layout_centerInParent="true"
+android:fontFamily="@font/arbutusslabregular"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ImageButton
+        android:id="@+id/cameraButton"
+        android:layout_marginTop="70dp"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/open_camera" />
 
 </RelativeLayout>

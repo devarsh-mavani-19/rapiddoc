@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ImageToPdf</string>
+    <string name="app_name">Rapid Doc</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_bottom_navigation">BottomNavigationActivity</string>
     <string name="title_home">Home</string>

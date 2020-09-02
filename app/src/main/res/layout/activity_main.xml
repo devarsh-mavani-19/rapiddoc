@@ -29,6 +29,7 @@
     <com.google.android.material.floatingactionbutton.FloatingActionButton
 
         android:id="@+id/fab"
+        app:backgroundTint="@color/colorPrimary"
 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,6 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
+        app:backgroundTint="@color/colorPrimary"
         android:layout_marginRight="28dp"
         android:layout_marginBottom="172dp"
         app:srcCompat="@drawable/qrcode" />
@@ -49,6 +51,8 @@
     <com.google.android.material.floatingactionbutton.FloatingActionButton
 
         android:id="@+id/fab_pdf"
+        app:backgroundTint="@color/colorPrimary"
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -62,6 +66,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
+        app:backgroundTint="@color/colorPrimary"
         android:layout_marginRight="28dp"
         android:layout_marginBottom="28dp"
         app:srcCompat="@drawable/ic_done_black_24dp" />
@@ -83,6 +88,8 @@
         android:visibility="invisible"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        app:backgroundTint="@color/colorPrimary"
+
         android:layout_gravity="bottom"
         android:background="@color/colorPrimary"
         android:weightSum="3">

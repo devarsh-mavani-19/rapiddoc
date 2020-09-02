@@ -59,7 +59,7 @@ public class QRCodeScannerActivity extends AppCompatActivity implements ZXingSca
         }
         else if(result.getText().startsWith("SMSTO:")) {
             Intent I =new Intent(Intent.ACTION_VIEW);
-            I.setData(Uri.parse("smsto:"));
+            I.setData(Uri.  parse("smsto:"));
             I.setType("vnd.android-dir/mms-sms");
             I.putExtra("address", new String (result.getText().substring(6)));
             I.putExtra( "sms_body","Enter your Sms here..");

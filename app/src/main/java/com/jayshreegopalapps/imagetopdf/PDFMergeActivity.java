@@ -2,42 +2,53 @@ package com.jayshreegopalapps.imagetopdf;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MotionEventCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.pdf.PdfCopy;
-import com.itextpdf.text.pdf.PdfReader;
+import com.tom_roush.pdfbox.multipdf.PDFMergerUtility;
+import com.tom_roush.pdfbox.pdmodel.PDDocument;
+//import com.itextpdf.text.Document;
+//import com.itextpdf.text.DocumentException;
+//import com.itextpdf.text.pdf.PdfCopy;
+//import com.itextpdf.text.pdf.PdfReader;
 
+
+//import org.apache.pdfbox.multipdf.PDFMergerUtility;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import me.toptas.fancyshowcase.FancyShowCaseQueue;
+import me.toptas.fancyshowcase.FancyShowCaseView;
 
 public class PDFMergeActivity extends AppCompatActivity {
     private static final int ADD_PDF_MERGE = 0;
@@ -46,21 +57,24 @@ public class PDFMergeActivity extends AppCompatActivity {
     MergePdfAdapter arrayAdapter;
     FloatingActionButton fab, fab2;
     ItemTouchHelper touchHelper;
-
+    SharedPreferences prefs;
+    RelativeLayout image_empty;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdfmerge);
-        final AdView mAdView = findViewById(R.id.ad_banner_merge);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+//        final AdView mAdView = findViewById(R.id.ad_banner_merge);
+//        AdRequest adRequest = new AdRequest.Builder().build();
+//        mAdView.loadAd(adRequest);
         initViews();
-
         refreshPage();
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!isPermissionGranted()) {
+                    return;
+                }
                 Intent intent = new Intent();
                 intent.setType("application/pdf");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -72,56 +86,222 @@ public class PDFMergeActivity extends AppCompatActivity {
         fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mergePDFs();
+                mergePDFs(1);
             }
         });
 
     }
 
-    private void mergePDFs() {
-        if(!arrayList.isEmpty()) {
-            String fileName = System.currentTimeMillis() + "";
-            Document document = new Document();
-            // Create pdf copy object to copy current document to the output mergedresult file
-            PdfCopy copy = null;
-            try {
-                copy = new PdfCopy(document, new FileOutputStream(Constants.PDF_STORAGE_PATH + fileName + ".pdf"));
-            } catch (DocumentException ex) {
-                ex.printStackTrace();
-            } catch (FileNotFoundException ex) {
-                ex.printStackTrace();
+    private boolean isPermissionGranted() {
+        if ((ContextCompat.checkSelfPermission(
+                getApplicationContext(), Manifest.permission.CAMERA) !=
+                PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
+                getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
+                getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},10);
             }
-            // Open the document
-            document.open();
-            PdfReader pr;
-            int n;
-            for (int i = 0; i < arrayList.size(); i++) {
-                // Create pdf reader object to read each input pdf file
-                try {
-                    pr = new PdfReader(getContentResolver().openInputStream(arrayList.get(i).uri));
-                    n = pr.getNumberOfPages();
-                    for (int page = 0; page < n; ) {
-                        // Import all pages from the file to PdfCopy
-                        copy.addPage(copy.getImportedPage(pr, ++page));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(this, "Failed to merge pdf.. Maybe one of the pdf is corrupted", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                // Get the number of pages of the pdf file
-
-            }
-            document.close(); // close the document
-            View parentLayout = findViewById(android.R.id.content);
-            Snackbar.make(parentLayout, "PDF saved to " + Constants.PDF_STORAGE_PATH + System.currentTimeMillis() + ".pdf", Snackbar.LENGTH_LONG).show();
+            return false;
         }
         else{
-            View parentLayout = findViewById(android.R.id.content);
-            Snackbar.make(parentLayout, "Please Select at least 1 PDF " , Snackbar.LENGTH_LONG).show();
+            return true;
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+            createDirs();
+        }
+    }
+
+    private void createDirs() {
+        isPermissionGranted();
+        File f = new File(Constants.PDF_MERGE_PATH);
+        File f2 = new File(Constants.PDF_PATH);
+        File f3 = new File(Constants.PDF_SPLIT_PATH);
+        File f4 = new File(Constants.PDF_WATERMARK_PATH);
+        File f5 = new File(Constants.PDF_STORAGE_PATH);
+
+        if(!f.exists()) {
+            f.mkdirs();
+        }
+        if(!f2.exists()) {
+            f2.mkdirs();
+        }
+        if(!f3.exists()) {
+            f3.mkdirs();
+        }
+        if(!f4.exists()) {
+            f4.mkdirs();
+        }
+        if(!f5.exists()) {
+            f5.mkdirs();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        prefs = getSharedPreferences("com.jayshreegopalapps.ImageToPdf", MODE_PRIVATE);
+
+        if (prefs.getBoolean("merge8", true)) {
+            // Do first run stuff here then set 'firstrun' as false
+            // using the following line to edit/commit prefs
+            prefs.edit().putBoolean("merge8", false).commit();
+
+            FancyShowCaseView fancyShowCaseView1 =new FancyShowCaseView.Builder(this)
+                    .focusOn(fab)
+                    .title(" \n           " +
+                            "\n   " +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "Add Pdf to merge list")
+
+                    .build();
+
+            FancyShowCaseView fancyShowCaseView3 =new FancyShowCaseView.Builder(this)
+                    .focusOn(fab2)
+                    .title(" \n           " +
+                            "\n   " +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "Merge PDF from here")
+                    .build();
+
+           /* new FancyShowCaseView.Builder(this)
+                    .focusOn(getSupportActionBar().getCustomView().findViewById(R.menu.menu_main))
+                    .title("Focus on View")
+                    .build()
+                    .show();*/
+            new FancyShowCaseQueue()
+                    .add(fancyShowCaseView1)
+                    .add(fancyShowCaseView3)
+                    .show();
+            File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
+            if (!docsFolder.exists()) {
+                docsFolder.mkdir();
+            }
+        }
+    }
+
+    private void mergePDFs(int x) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                final AlertDialog[] dialog = new AlertDialog[1];
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run()
+                    {
+                        dialog[0] = new AlertDialog.Builder(PDFMergeActivity.this).setCancelable(false).setView(R.layout.layout_loading_dialog).create();
+                        dialog[0].show();
+                    }
+                });
+                if(!arrayList.isEmpty()) {
+                    String fileName = "Merge_" + System.currentTimeMillis() + "";
+                    PDFMergerUtility mergerUtility = new PDFMergerUtility();
+                    mergerUtility.setDestinationFileName(Constants.PDF_MERGE_PATH + fileName + ".pdf");
+
+                    for (int i = 0; i < arrayList.size(); i++) {
+                        // Create pdf reader object to read each input pdf file
+                        try {
+                            mergerUtility.addSource(getContentResolver().openInputStream(arrayList.get(i).uri));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(PDFMergeActivity.this, "Failed to merge pdf.. Maybe one of the pdf is corrupted", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            return;
+                        }
+                    }
+                    try {
+                        mergerUtility.mergeDocuments(true);
+                        View parentLayout = findViewById(android.R.id.content);
+                        Snackbar.make(parentLayout, "PDF saved to " + Constants.PDF_MERGE_PATH + fileName + ".pdf", Snackbar.LENGTH_LONG).show();
+                        Intent i = new Intent(PDFMergeActivity.this, OpenPDFActivity.class);
+                        i.setDataAndType(Uri.parse("file:///" + Constants.PDF_MERGE_PATH + fileName + ".pdf"), "application/pdf");
+                        startActivity(i);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        View parentLayout = findViewById(android.R.id.content);
+                        Snackbar.make(parentLayout, "Failed to save PDF", Snackbar.LENGTH_LONG).show();
+
+                    }
+
+                }
+                else{
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Please Select at least 1 PDF " , Snackbar.LENGTH_LONG).show();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog[0].dismiss();
+                    }
+                });
+            }
+        }).start();
 
     }
+
+//    private void mergePDFs() {
+//        if(!arrayList.isEmpty()) {
+//            String fileName = System.currentTimeMillis() + "";
+//            Document document = new Document();
+//            // Create pdf copy object to copy current document to the output mergedresult file
+//            PdfCopy copy = null;
+//            try {
+//                copy = new PdfCopy(document, new FileOutputStream(Constants.PDF_STORAGE_PATH + fileName + ".pdf"));
+//            } catch (DocumentException ex) {
+//                ex.printStackTrace();
+//            } catch (FileNotFoundException ex) {
+//                ex.printStackTrace();
+//            }
+//            // Open the document
+//            document.open();
+//            PdfReader pr;
+//            int n;
+//            for (int i = 0; i < arrayList.size(); i++) {
+//                // Create pdf reader object to read each input pdf file
+//                try {
+//                    pr = new PdfReader(getContentResolver().openInputStream(arrayList.get(i).uri));
+//                    n = pr.getNumberOfPages();
+//                    for (int page = 0; page < n; ) {
+//                        // Import all pages from the file to PdfCopy
+//                        copy.addPage(copy.getImportedPage(pr, ++page));
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    Toast.makeText(this, "Failed to merge pdf.. Maybe one of the pdf is corrupted", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                // Get the number of pages of the pdf file
+//
+//            }
+//            document.close(); // close the document
+//            View parentLayout = findViewById(android.R.id.content);
+//            Snackbar.make(parentLayout, "PDF saved to " + Constants.PDF_STORAGE_PATH + System.currentTimeMillis() + ".pdf", Snackbar.LENGTH_LONG).show();
+//        }
+//        else{
+//            View parentLayout = findViewById(android.R.id.content);
+//            Snackbar.make(parentLayout, "Please Select at least 1 PDF " , Snackbar.LENGTH_LONG).show();
+//        }
+//
+//    }
 
 //            Intent intent = new Intent(Intent.ACTION_VIEW);
 //            intent.setDataAndType(Uri.parse(getExternalFilesDir(null)+"/" + fileName + ".pdf"), "application/pdf");
@@ -145,6 +325,7 @@ public class PDFMergeActivity extends AppCompatActivity {
                             PdfModelMerge pdfModel = new PdfModelMerge();
                             pdfModel.uri = uri_path;
                             arrayList.add(pdfModel);
+                            image_empty.setVisibility(View.GONE);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -157,6 +338,7 @@ public class PDFMergeActivity extends AppCompatActivity {
                         PdfModelMerge pdfModelMerge = new PdfModelMerge();
                         pdfModelMerge.uri = uri_path;
                         arrayList.add(pdfModelMerge);
+                        image_empty.setVisibility(View.GONE);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -193,6 +375,7 @@ public class PDFMergeActivity extends AppCompatActivity {
 
         fab = findViewById(R.id.fab_add_pdf_merge);
         fab2 = findViewById(R.id.fab_done_pdf_merge);
+        image_empty = findViewById(R.id.empty_image_merge);
     }
 
     private class PdfModelMerge {

@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class DateTimeUtils {
     public static String getDateTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
         Date d = new Date();
         d.setTime(System.currentTimeMillis());
         return sdf.format(d);

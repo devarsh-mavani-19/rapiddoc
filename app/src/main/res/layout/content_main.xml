@@ -8,24 +8,41 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <com.google.android.gms.ads.AdView
-        ads:layout_constraintTop_toTopOf="parent"
-        ads:layout_constraintLeft_toLeftOf="parent"
-        xmlns:ads="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/adView_banner_main"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-4411531601838575/5504108625">
-    </com.google.android.gms.ads.AdView>
+<!--    <com.google.android.gms.ads.AdView-->
+<!--        ads:layout_constraintTop_toTopOf="parent"-->
+<!--        ads:layout_constraintLeft_toLeftOf="parent"-->
+<!--        xmlns:ads="http://schemas.android.com/apk/res-auto"-->
+<!--        android:id="@+id/adView_banner_main"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        ads:adSize="BANNER"-->
+<!--        ads:adUnitId="ca-app-pub-4411531601838575/5504108625">-->
+<!--    </com.google.android.gms.ads.AdView>-->
 
 <LinearLayout
+    android:id="@+id/ll_empty"
     android:layout_width="match_parent"
     app:layout_constraintTop_toBottomOf="@+id/adView_banner_main"
-android:paddingBottom="80dp"
+    android:orientation="vertical"
+    android:paddingBottom="80dp"
     android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/empty_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_centerInParent="true"
+            android:src="@drawable/nodocsfound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/folders_grid_content_main"
         android:layout_width="match_parent"

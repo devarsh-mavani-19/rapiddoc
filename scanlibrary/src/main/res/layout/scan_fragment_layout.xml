@@ -2,23 +2,45 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
+    android:background="#fff"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/scanButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/colorPGreen"
-        android:orientation="horizontal"
-        android:padding="@dimen/bottom_bar_padding"
-        android:text="@string/scan"></Button>
+    <RelativeLayout
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimaryDark"
+        android:id="@+id/rel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <ImageView
+            android:id="@+id/scanButton"
+            android:layout_gravity="end"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="10dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/fab_done" />
+
+    </RelativeLayout>
+
+
+
+
+<!--    <Button-->
+<!--        android:id="@+id/scanButton"-->
+<!--        android:layout_width="fill_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:background="@color/colorPGreen"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:padding="@dimen/bottom_bar_padding"-->
+<!--        android:text="@string/scan"></Button>-->
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/scanButton"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/rel"
         android:layout_gravity="center"
         android:layout_margin="@dimen/scanPadding">
 

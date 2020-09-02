@@ -9,6 +9,9 @@
    <com.google.android.material.textfield.TextInputEditText
        android:id="@+id/rename_file_rename_bottom_modal"
        android:hint="Rename File as ..."
+       android:textColorHint="@color/colorPrimaryDark"
+android:textSize="12sp"
+       android:fontFamily="@font/arbutusslabregular"
        android:padding="20dp"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"/>
@@ -23,15 +26,24 @@
           android:id="@+id/save_rename_bottom_modal"
           android:layout_margin="20dp"
           android:text="Save"
+          android:fontFamily="@font/arbutusslabregular"
+android:textSize="12sp"
+          android:background="@color/colorAccent"
+          android:textColor="@color/colorPrimary"
           android:layout_weight="1"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"/>
       <Button
           android:id="@+id/cancel_rename_bottom_modal"
           android:text="Discard"
+          android:textSize="12sp"
+          android:background="@color/colorAccent"
+          android:textColor="@color/colorPrimary"
           android:layout_margin="20dp"
           android:layout_weight="1"
           android:layout_width="match_parent"
+          android:fontFamily="@font/arbutusslabregular"
+
           android:layout_height="wrap_content"/>
 
    </LinearLayout>

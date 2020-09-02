@@ -24,7 +24,7 @@ public class ResultFragment extends Fragment {
 
     private View view;
     private ImageView scannedImageView;
-    private Button doneButton;
+    private ImageView doneButton;
     private Bitmap original;
     private Button originalButton;
     private Button MagicColorButton;
@@ -55,7 +55,7 @@ public class ResultFragment extends Fragment {
         bwButton.setOnClickListener(new BWButtonClickListener());
         Bitmap bitmap = getBitmap();
         setScannedImage(bitmap);
-        doneButton = (Button) view.findViewById(R.id.doneButton);
+        doneButton = (ImageView) view.findViewById(R.id.doneButton);
         doneButton.setOnClickListener(new DoneButtonClickListener());
     }
 

@@ -11,7 +11,7 @@
 
 
     <LinearLayout
-        android:padding="3dp"
+        android:padding="2dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -21,6 +21,7 @@
             android:id="@+id/image_recycler_customview"
             android:layout_width="wrap_content"
             android:scaleType="fitCenter"
+            android:layout_marginBottom="-20dp"
             android:forceHasOverlappingRendering="true"
             android:layout_height="80dp"/>
 
@@ -42,11 +43,11 @@
             android:layout_gravity="center"
             android:textStyle="bold"
             android:text="FolderName"
-            android:fontFamily="sans-serif"
+            android:fontFamily="@font/arbutusslabregular"
             android:gravity="center"
             android:padding="2dp"
-            android:textSize="10dp"
-            android:textColor="@color/colorBlack"></TextView>
+            android:textSize="9dp"
+            android:textColor="@color/colorPrimary"></TextView>
 
         <TextView
             android:id="@+id/txt_recycler_customview_date"
@@ -55,13 +56,13 @@
             android:layout_below="@+id/image_recycler_customview"
             android:layout_gravity="center"
             android:text="date    time"
-            android:fontFamily="sans-serif"
+            android:fontFamily="@font/arbutusslabregular"
             android:textSize="8dp"
             android:gravity="start"
             android:padding="2dp"
             android:layout_weight="1"
 
-            android:textColor="@color/colorBlack"></TextView>
+            android:textColor="@color/colorPrimary"></TextView>
 
         <TextView
             android:id="@+id/txt_recycler_customview_no_of_pages"
@@ -71,11 +72,10 @@
             android:layout_gravity="center"
             android:text="10 Pages"
             android:textSize="8dp"
-
-            android:fontFamily="sans-serif"
+            android:fontFamily="@font/arbutusslabregular"
             android:gravity="start"
             android:layout_weight="1"
             android:padding="2dp"
-            android:textColor="@color/colorBlack"></TextView>
+            android:textColor="@color/colorPrimary"></TextView>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

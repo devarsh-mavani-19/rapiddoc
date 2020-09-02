@@ -10,20 +10,22 @@
         >
         <TextView
             android:id="@+id/range_no_split"
-            android:layout_weight="1"
-            android:padding="30dp"
+            android:layout_weight=".5"
+            android:padding="10dp"
             android:text="Range 1"
             android:textSize="20dp"
             android:textStyle="bold"
             android:layout_width="match_parent"
+            android:fontFamily="@font/arbutusslabregular"
             android:layout_height="wrap_content" />
         <ImageView
             android:id="@+id/drag_handle_split_pdf"
             android:layout_gravity="center"
-            android:layout_weight="2"
+            android:layout_weight="2.5"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_drag_handle_black_24dp"
+            android:src="@drawable/ic_delete_black_24dp3"
             />
 
     </LinearLayout>
@@ -31,13 +33,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="30dp"
+        android:padding="10dp"
         android:weightSum="4"
         >
 
         <TextView
             android:text="From : "
             android:layout_weight="1"
+            android:fontFamily="@font/arbutusslabregular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -52,6 +55,7 @@
             android:text="To : "
             android:layout_weight="1"
             android:layout_width="match_parent"
+            android:fontFamily="@font/arbutusslabregular"
             android:layout_height="wrap_content" />
 
         <EditText

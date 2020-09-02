@@ -6,30 +6,35 @@
     android:layout_height="match_parent"
     tools:context=".SplitByFixedRangeActivity">
 
-    <com.google.android.gms.ads.AdView
-        ads:layout_constraintTop_toTopOf="parent"
-        ads:layout_constraintLeft_toLeftOf="parent"
-        xmlns:ads="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/ad_banner_split_by_range"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-4411531601838575/9821986957">
-    </com.google.android.gms.ads.AdView>
+<!--    <com.google.android.gms.ads.AdView-->
+<!--        ads:layout_constraintTop_toTopOf="parent"-->
+<!--        ads:layout_constraintLeft_toLeftOf="parent"-->
+<!--        xmlns:ads="http://schemas.android.com/apk/res-auto"-->
+<!--        android:id="@+id/ad_banner_split_by_range"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        ads:adSize="BANNER"-->
+<!--        ads:adUnitId="ca-app-pub-4411531601838575/9821986957">-->
+<!--    </com.google.android.gms.ads.AdView>-->
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/fixed_range_split"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Split every number of pages"
-        android:layout_margin="50dp"
+        android:hint="Ex: Split at every 2 pages"
+        android:layout_margin="20dp"
         android:inputType="number"
+        android:fontFamily="@font/arbutusslabregular"
+        android:textSize="12sp"
+        android:textColorHint="@color/colorPrimary"
+
         app:layout_constraintTop_toBottomOf="@+id/ad_banner_split_by_range"
         app:layout_constraintLeft_toLeftOf="parent"
         />
     <LinearLayout
+        android:id="@+id/ll_buttons_split_fixed"
         app:layout_constraintTop_toBottomOf="@+id/fixed_range_split"
         android:orientation="horizontal"
         android:weightSum="2"
@@ -38,23 +43,44 @@
     <Button
         android:id="@+id/button_fixed_range_done"
         android:text="Split"
-        android:background="@color/colorPRed"
+        android:fontFamily="@font/arbutusslabregular"
+        android:textStyle="bold"
+
+        android:background="@color/colorAccent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:textSize="10sp"
         android:layout_margin="20dp"
-        android:textColor="#fff"
+        android:textColor="@color/colorPrimary"
         />
         <Button
             android:id="@+id/button_fixed_range_select_pdf"
             android:text="Select PDF"
-            android:background="@color/colorPRed"
+            android:background="@color/colorAccent"
             android:layout_width="match_parent"
+            android:fontFamily="@font/arbutusslabregular"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textStyle="bold"
+            android:textSize="10sp"
             android:layout_margin="20dp"
-            android:textColor="#fff"
+            android:textColor="@color/colorPrimary"
             />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/pdf_select_message_split_fixed"
+        app:layout_constraintTop_toBottomOf="@+id/ll_buttons_split_fixed"
+        android:padding="20dp"
+        android:layout_margin="20dp"
+        android:textSize="12sp"
+        android:textColor="@color/colorGray"
+        android:textStyle="bold"
+        android:fontFamily="@font/arbutusslabregular"
+        android:text="No PDF Selected"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -43,7 +43,7 @@ public class ScanActivity extends Activity implements IScanner, ComponentCallbac
         fragment.setArguments(bundle);
         android.app.FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.content, fragment);
+        fragmentTransaction.replace(R.id.content, fragment);
         fragmentTransaction.addToBackStack(ScanFragment.class.toString());
         fragmentTransaction.commit();
     }
@@ -97,8 +97,8 @@ public class ScanActivity extends Activity implements IScanner, ComponentCallbac
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.low_memory)
                         .setMessage(R.string.low_memory_message)
-                        .create()
-                        .show();
+                        .create();
+
                 break;
             default:
                 /*

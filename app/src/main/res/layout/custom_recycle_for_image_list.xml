@@ -16,25 +16,28 @@
         android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:buttonTint="@color/colorAccent"
         android:layout_alignRight="@+id/image_inside_folder"
         android:layout_alignBottom="@+id/image_inside_folder"
-        android:layout_marginRight="21dp"
+        android:layout_marginRight="10dp"
         android:layout_marginBottom="39dp" />
 
     <TextView
+        android:visibility="invisible"
         android:id="@+id/image_page_number"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/image_inside_folder"
         android:layout_gravity="center"
         android:layout_marginTop="-30dp"
-        android:fontFamily="sans-serif"
+        android:fontFamily="@font/arbutusslabregular"
         android:gravity="center"
         android:padding="5dp"
-        android:background="@color/colorBlack"
-        android:alpha=".7"
+        android:background="@color/colorAccent"
+        android:alpha=".5"
         android:text="Page Number"
-        android:textColor="@color/colorWhite"
+        android:textSize="12sp"
+        android:textColor="@color/colorPrimaryDark"
         android:textStyle="bold"></TextView>
 
 </RelativeLayout>

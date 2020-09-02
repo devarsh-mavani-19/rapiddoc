@@ -12,24 +12,21 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+
 import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfCopy;
-import com.itextpdf.text.pdf.PdfImportedPage;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
-import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
+//import com.itextpdf.text.Document;
+//import com.itextpdf.text.Document;
+//import com.itextpdf.text.pdf.PdfCopy;
+//import com.itextpdf.text.pdf.PdfImportedPage;
+//import com.itextpdf.text.pdf.PdfReader;
+//import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
+//import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
 import com.scanlibrary.ScanActivity;
 import com.scanlibrary.ScanConstants;
+import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -44,9 +41,11 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -78,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     String parent;
     Toolbar toolbar;
     CheckBox check;
+    ImageView empty_image;
     private RecyclerView recyclerView;
     private FloatingActionButton fab, fab2, fab3;
     LinearLayout bottomNavigationView;
@@ -89,12 +89,14 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     HashMap<Integer, String> selectedItems;
     SharedPreferences prefs = null;
     int paddingBottomRecyclerView;
-    private InterstitialAd interstitialAd;
+//    private InterstitialAd interstitialAd;
     MenuItem renameItem;
+    RelativeLayout imageView_empty;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        PDFBoxResourceLoader.init(getApplicationContext());
         prefs = getSharedPreferences("com.jayshreegopalapps.ImageToPdf", MODE_PRIVATE);
 //        MobileAds.initialize(this, new OnInitializationCompleteListener() {
 //            @Override
@@ -102,27 +104,29 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //            }
 //        });
 
-        MobileAds.initialize(getApplicationContext());
+//        MobileAds.initialize(getApplicationContext());
 
-        prepareAd();
+//        prepareAd();
+
+        createDirs();
 
 
-
-        final AdView mAdView = findViewById(R.id.adView_banner_main);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-        mAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdFailedToLoad(int i) {
-                super.onAdFailedToLoad(i);
-            }
-        });
+//        final AdView mAdView = findViewById(R.id.adView_banner_main);
+//        AdRequest adRequest = new AdRequest.Builder().build();
+//        mAdView.loadAd(adRequest);
+//        mAdView.setAdListener(new AdListener() {
+//            @Override
+//            public void onAdFailedToLoad(int i) {
+//                super.onAdFailedToLoad(i);
+//            }
+//        });
 
         //ask permissions
         askPermissions();
 
         //init views
         initViews();
+
 
         //set ActionBar
         setSupportActionBar(toolbar);
@@ -148,13 +152,15 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //                startActivityForResult(intent, 0);
                 //launch interstitial ads
 
-                askPermissions();
+                if(!askPermissions()) {
+                    return;
+                }
 
                 if ((ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.CAMERA) ==
-                        PackageManager.PERMISSION_GRANTED)&& (ContextCompat.checkSelfPermission(
+                        PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                        PackageManager.PERMISSION_GRANTED)&& (ContextCompat.checkSelfPermission(
+                        PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                         PackageManager.PERMISSION_GRANTED)) {
                     int REQUEST_CODE = 0;
@@ -181,9 +187,21 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 Chip pdf_to_image_ = a.findViewById(R.id.pdf_to_image);
                 Chip pdf_merge_ = a.findViewById(R.id.pdf_merge);
                 Chip pdf_split_ = a.findViewById(R.id.pdf_split);
+
                 //Chip pdf_watermark_  = a.findViewById(R.id.pdf_watermark);
                 final Chip split_by_fixed_range_ = a.findViewById(R.id.split_by_fixed_range);
                 final Chip compress_pdf_ = a.findViewById(R.id.compress_pdf);
+//                Chip image_in_pdf_ = a.findViewById(R.id.image_in_pdf);
+
+//                image_in_pdf_.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        a.dismiss();
+//                        Intent i = new Intent(getApplicationContext(), ImageInPDFActivity.class);
+//                        startActivity(i);
+//                    }
+//                });
+
 
 
                 pdf_merge_.setOnClickListener(new View.OnClickListener() {
@@ -197,6 +215,9 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     @Override
                     public void onClick(View v) {
                         a.dismiss();
+                        if(!askPermissions()) {
+                            return;
+                        }
                         pdf_image(v);
                     }
                 });
@@ -227,7 +248,9 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     @Override
                     public void onClick(View v) {
                         a.dismiss();
-                        compress_pdf();
+//                        compress_pdf();
+                        Intent i = new Intent(MainActivity.this, AddWatermarkActivity.class);
+                        startActivity(i);
                     }
                 });
             }
@@ -242,17 +265,53 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         fab3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!askPermissions()) {
+                    return;
+                }
                 Intent i = new Intent(getApplicationContext(), QRCodeScannerActivity.class);
                 startActivity(i);
             }
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+            createDirs();
+        }
+    }
 
-public void prepareAd() {
-    interstitialAd = new InterstitialAd(getApplicationContext());
-    interstitialAd.setAdUnitId("ca-app-pub-4411531601838575/9330661235");
-    interstitialAd.loadAd(new AdRequest.Builder().build());
+    private void createDirs() {
+        askPermissions();
+        File f = new File(Constants.PDF_MERGE_PATH);
+        File f2 = new File(Constants.PDF_PATH);
+        File f3 = new File(Constants.PDF_SPLIT_PATH);
+        File f4 = new File(Constants.PDF_WATERMARK_PATH);
+        File f5 = new File(Constants.PDF_STORAGE_PATH);
+
+        if(!f.exists()) {
+            f.mkdirs();
+        }
+        if(!f2.exists()) {
+            f2.mkdirs();
+        }
+        if(!f3.exists()) {
+            f3.mkdirs();
+        }
+        if(!f4.exists()) {
+            f4.mkdirs();
+        }
+        if(!f5.exists()) {
+            f5.mkdirs();
+        }
+    }
+
+
+    public void prepareAd() {
+//    interstitialAd = new InterstitialAd(getApplicationContext());
+//    interstitialAd.setAdUnitId("ca-app-pub-4411531601838575/9330661235");
+//    interstitialAd.loadAd(new AdRequest.Builder().build());
 }
 
     private void initHorizontalBar() {
@@ -326,6 +385,7 @@ public void prepareAd() {
         toolbar = findViewById(R.id.toolbar);
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
         paddingBottomRecyclerView = recyclerView.getPaddingBottom();
+        imageView_empty = findViewById(R.id.empty_image);
     }
 
     private void initializeBottomMenu() {
@@ -428,19 +488,21 @@ public void prepareAd() {
         return listOfFilesAndFolders;
     }
 
-    private void askPermissions() {
+    private boolean askPermissions() {
         //permission
         if ((ContextCompat.checkSelfPermission(
                 getApplicationContext(), Manifest.permission.CAMERA) !=
-                PackageManager.PERMISSION_GRANTED)&& (ContextCompat.checkSelfPermission(
+                PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
                 getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) !=
-                PackageManager.PERMISSION_GRANTED)&& (ContextCompat.checkSelfPermission(
+                PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
                 getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
                 PackageManager.PERMISSION_GRANTED)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},10);
             }
+            return false;
         }
+        return true;
     }
 
     @Override
@@ -458,6 +520,8 @@ public void prepareAd() {
         bottomNavigationView.setVisibility(View.VISIBLE);
         recyclerView.setPadding(recyclerView.getPaddingLeft(), recyclerView.getPaddingTop(), recyclerView.getPaddingRight(), (recyclerView.getPaddingBottom() + 60));
         fab.hide();
+        fab2.hide();
+        fab3.hide();
         //change action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         isInMultiSelectMode = true;
@@ -466,9 +530,9 @@ public void prepareAd() {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(interstitialAd.isLoaded()) {
-            interstitialAd.show();
-        }
+//        if(interstitialAd.isLoaded()) {
+//            interstitialAd.show();
+//        }
 
         prepareAd();
         if (requestCode == 0 && resultCode == RESULT_OK) {
@@ -776,39 +840,39 @@ public void prepareAd() {
         if (requestCode == RESULT_PDF_TO_WORD) {
             if(data!=null) {
                 if(data.getData()!=null) {
-                    Uri uri = data.getData();
-                    try {
-                        PdfReader reader = new PdfReader(getContentResolver().openInputStream(uri));
-                        PdfReaderContentParser parser = new PdfReaderContentParser(reader);
-                        SimpleTextExtractionStrategy strategy = parser.processContent(1,new SimpleTextExtractionStrategy());
-                        String text = strategy.getResultantText();
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+//                    Uri uri = data.getData();
+//                    try {
+//                        PdfReader reader = new PdfReader(getContentResolver().openInputStream(uri));
+//                        PdfReaderContentParser parser = new PdfReaderContentParser(reader);
+//                        SimpleTextExtractionStrategy strategy = parser.processContent(1,new SimpleTextExtractionStrategy());
+//                        String text = strategy.getResultantText();
+//
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
                 }
             }
         }
         if(requestCode == RESULT_COMPRESS_PDF) {
             if(data!=null) {
                 if (data.getData()!=null) {
-                    PdfReader reader = null;
-                    try {
-                        reader = new PdfReader(getContentResolver().openInputStream(data.getData()));
-                        Document document = new Document();
-                        PdfCopy writer = new PdfCopy(document, new FileOutputStream(Constants.PDF_STORAGE_PATH+ System.currentTimeMillis() + ".pdf"));
-                        document.open();
-                        for(int i = 1;i <= reader.getNumberOfPages();i++) {
-                            PdfImportedPage page = writer.getImportedPage(reader, i);
-                            writer.addPage(page);
-                        }
-                        document.close();
-                        writer.setFullCompression();
-                        writer.close();
-                        Toast.makeText(this, "Compressed file stored at " + Constants.PDF_STORAGE_PATH+ System.currentTimeMillis() + ".pdf", Toast.LENGTH_LONG).show();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+//                    PdfReader reader = null;
+//                    try {
+//                        reader = new PdfReader(getContentResolver().openInputStream(data.getData()));
+//                        Document document = new Document();
+//                        PdfCopy writer = new PdfCopy(document, new FileOutputStream(Constants.PDF_STORAGE_PATH+ System.currentTimeMillis() + ".pdf"));
+//                        document.open();
+//                        for(int i = 1;i <= reader.getNumberOfPages();i++) {
+//                            PdfImportedPage page = writer.getImportedPage(reader, i);
+//                            writer.addPage(page);
+//                        }
+//                        document.close();
+//                        writer.setFullCompression();
+//                        writer.close();
+//                        Toast.makeText(this, "Compressed file stored at " + Constants.PDF_STORAGE_PATH+ System.currentTimeMillis() + ".pdf", Toast.LENGTH_LONG).show();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
                 }
             }
         }
@@ -975,7 +1039,7 @@ public void prepareAd() {
         }
 
         if(id == R.id.action_import_gallery) {
-
+            askPermissions();
             int REQUEST_CODE = 5;
             int preference = ScanConstants.OPEN_MEDIA;
             Intent intent = new Intent(getApplicationContext(), ScanActivity.class);
@@ -1036,10 +1100,18 @@ public void prepareAd() {
         if(isInMultiSelectMode) {
             check = findViewById(R.id.check_multi_select);
             check.setVisibility(View.INVISIBLE);
+            renameItem.setEnabled(false);
         }
 
         arrayList.clear();
         fetchRootFolders(parent);
+
+        if(arrayList.isEmpty()) {
+            imageView_empty.setVisibility(View.VISIBLE);
+        }
+        else {
+            imageView_empty.setVisibility(View.GONE);
+        }
 
         recycleAdapter = new RecycleAdapter(getApplicationContext(), arrayList, new MultipleSelectionInterface() {
             @Override
@@ -1072,6 +1144,8 @@ public void prepareAd() {
         }
         recyclerView.setPadding(recyclerView.getPaddingLeft(), recyclerView.getPaddingTop(), recyclerView.getPaddingRight(), paddingBottomRecyclerView);
         fab.show();
+        fab2.show();
+        fab3.show();
         bottomNavigationView.setVisibility(View.INVISIBLE);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         isInMultiSelectMode = false;
@@ -1271,7 +1345,6 @@ public void prepareAd() {
     private void split_by_fixed_range() {
         Intent intent = new Intent(getApplicationContext(), SplitByFixedRangeActivity.class);
         startActivity(intent);
-        finish();
     }
 
     private void compress_pdf() {

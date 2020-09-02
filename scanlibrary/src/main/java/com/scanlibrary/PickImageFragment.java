@@ -194,13 +194,7 @@ public class PickImageFragment extends Fragment {
                     case ScanConstants.START_CAMERA_REQUEST_CODE:
                         File nFile = new File(mFilePath);
 
-                        if(nFile.exists()) {
-                            Toast.makeText(getActivity().getApplicationContext(), "File Created", Toast.LENGTH_SHORT).show();
                             bitmap = getBitmap(fileUri);
-                        }
-                        else {
-                            Toast.makeText(getActivity().getApplicationContext(), "Loading Please Wait...", Toast.LENGTH_SHORT).show();
-                        }
 
 //                        bitmap = (Bitmap) data.getExtras().get("data");
                         break;

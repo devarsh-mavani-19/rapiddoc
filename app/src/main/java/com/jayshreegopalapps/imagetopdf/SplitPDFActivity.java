@@ -2,17 +2,26 @@ package com.jayshreegopalapps.imagetopdf;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MotionEventCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.SharedMemory;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -21,21 +30,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfCopy;
-import com.itextpdf.text.pdf.PdfImportedPage;
-import com.itextpdf.text.pdf.PdfReader;
+import com.tom_roush.pdfbox.multipdf.Splitter;
+import com.tom_roush.pdfbox.pdmodel.PDDocument;
 
+//import com.itextpdf.text.pdf.PdfReader;
+
+//import org.apache.pdfbox.multipdf.Splitter;
+//import org.apache.pdfbox.pdmodel.PDDocument;
+
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import me.toptas.fancyshowcase.FancyShowCaseQueue;
+import me.toptas.fancyshowcase.FancyShowCaseView;
 
 public class SplitPDFActivity extends AppCompatActivity {
     RecyclerView recyclerView;
@@ -47,14 +66,15 @@ public class SplitPDFActivity extends AppCompatActivity {
     Uri pdfUri;
     int maxPageNumber;
     private int RESULT_PDF_SPLIT = 0;
+    RelativeLayout empty_image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_split_pdf);
-        final AdView mAdView = findViewById(R.id.ad_banner_split);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+//        final AdView mAdView = findViewById(R.id.ad_banner_split);
+////        AdRequest adRequest = new AdRequest.Builder().build();
+////        mAdView.loadAd(adRequest);
 
         initViews();
 
@@ -67,20 +87,29 @@ public class SplitPDFActivity extends AppCompatActivity {
             public void onClick(View v) {
                 arrayList.add(new RangeModel());
                 adapter.notifyDataSetChanged();
+                if(!arrayList.isEmpty()) {
+                    empty_image.setVisibility(View.GONE);
+                }
             }
         });
 
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                splitPdf();
-
+                if(!isPermissionGranted()) {
+                    return;
+                }
+                SplitPdfTask task = new SplitPdfTask(SplitPDFActivity.this);
+                task.execute();
             }
         });
 
         addPdf.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!isPermissionGranted()) {
+                    return;
+                }
                 System.out.println("opening intent");
                 Intent intent = new Intent();
                 intent.setType("application/pdf");
@@ -91,6 +120,118 @@ public class SplitPDFActivity extends AppCompatActivity {
 
     }
 
+    private boolean isPermissionGranted() {
+        if ((ContextCompat.checkSelfPermission(
+                getApplicationContext(), Manifest.permission.CAMERA) !=
+                PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
+                getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
+                getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},10);
+            }
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+            createDirs();
+        }
+    }
+
+    private void createDirs() {
+        isPermissionGranted();
+        File f = new File(Constants.PDF_MERGE_PATH);
+        File f2 = new File(Constants.PDF_PATH);
+        File f3 = new File(Constants.PDF_SPLIT_PATH);
+        File f4 = new File(Constants.PDF_WATERMARK_PATH);
+        File f5 = new File(Constants.PDF_STORAGE_PATH);
+
+        if(!f.exists()) {
+            f.mkdirs();
+        }
+        if(!f2.exists()) {
+            f2.mkdirs();
+        }
+        if(!f3.exists()) {
+            f3.mkdirs();
+        }
+        if(!f4.exists()) {
+            f4.mkdirs();
+        }
+        if(!f5.exists()) {
+            f5.mkdirs();
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences prefs = getSharedPreferences("com.jayshreegopalapps.ImageToPdf", MODE_PRIVATE);
+        if (prefs.getBoolean("split8", true)) {
+            // Do first run stuff here then set 'firstrun' as false
+            // using the following line to edit/commit prefs
+            prefs.edit().putBoolean("split8", false).commit();
+
+            FancyShowCaseView fancyShowCaseView1 =new FancyShowCaseView.Builder(this)
+                    .focusOn(addPdf)
+                    .title(" \n           " +
+                            "\n   " +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "Select a PDF")
+
+                    .build();
+
+            FancyShowCaseView fancyShowCaseView3 =new FancyShowCaseView.Builder(this)
+                    .focusOn(button)
+                    .title(" \n           " +
+                            "\n   " +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "add Custom Range")
+                    .build();
+
+            FancyShowCaseView fancyShowCaseView2 =new FancyShowCaseView.Builder(this)
+                    .focusOn(done)
+                    .title(" \n           " +
+                            "\n   " +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "\n" +
+                            "Split PDF")
+                    .build();
+
+           /* new FancyShowCaseView.Builder(this)
+                    .focusOn(getSupportActionBar().getCustomView().findViewById(R.menu.menu_main))
+                    .title("Focus on View")
+                    .build()
+                    .show();*/
+            new FancyShowCaseQueue()
+                    .add(fancyShowCaseView1)
+                    .add(fancyShowCaseView3)
+                    .add(fancyShowCaseView2)
+                    .show();
+            File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
+            if (!docsFolder.exists()) {
+                docsFolder.mkdir();
+            }
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -99,11 +240,12 @@ public class SplitPDFActivity extends AppCompatActivity {
                 if(data.getData()!=null) {
                     pdfUri = data.getData();
                     if(pdfUri!=null) {
-                        PdfReader reader = null;
+                        PDDocument reader = null;
                         try {
-                            reader = new PdfReader(getContentResolver().openInputStream(pdfUri));
+                            reader = PDDocument.load(getContentResolver().openInputStream(pdfUri));
                             maxPageNumber = reader.getNumberOfPages();
                             textView.setText("PDF selected");
+                            Toast.makeText(this, "PDF selected", Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -118,7 +260,7 @@ public class SplitPDFActivity extends AppCompatActivity {
         if(getIntent().getExtras()!=null) {
             pdfUri = Uri.parse(getIntent().getExtras().getString("PDF"));
             try {
-                PdfReader reader = new PdfReader(getContentResolver().openInputStream(pdfUri));
+                PDDocument reader = PDDocument.load(getContentResolver().openInputStream(pdfUri));
                 maxPageNumber = reader.getNumberOfPages();
                 System.out.println("page number = " + maxPageNumber);
                 reader.close();
@@ -128,39 +270,39 @@ public class SplitPDFActivity extends AppCompatActivity {
         }
     }
 
-    private void splitPdf() {
-        if(pdfUri!=null) {
-            if (adapter.areAllRangeValid()) {
-                ArrayList<RangeModel> list = adapter.getArrayList();
-                try {
-                    PdfReader reader = new PdfReader(getContentResolver().openInputStream(pdfUri));
-                    for (int i = 0; i < list.size(); i++) {
-                        Document document = new Document();
-                        PdfCopy writer = new PdfCopy(document, new FileOutputStream(Constants.PDF_STORAGE_PATH + System.currentTimeMillis() + ".pdf"));
-                        document.open();
-                        for (int j = list.get(i).fromRange; j <= list.get(i).toRange; j++) {
-                            PdfImportedPage page = writer.getImportedPage(reader, j);
-                            writer.addPage(page);
-                        }
-                        document.close();
-                        writer.close();
-                        View parentLayout = findViewById(android.R.id.content);
-                        Snackbar.make(parentLayout, "PDF saved to " + Constants.PDF_STORAGE_PATH + System.currentTimeMillis() + ".pdf", Snackbar.LENGTH_LONG).show();
-                    }
-                    reader.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else {
-                View parentLayout = findViewById(android.R.id.content);
-                Snackbar.make(parentLayout, "Invalid Ranges To proceed", Snackbar.LENGTH_LONG).show();
-            }
-        }
-        else{
-            View parentLayout = findViewById(android.R.id.content);
-            Snackbar.make(parentLayout, "Please Select a PDF", Snackbar.LENGTH_LONG).show();
-        }
-    }
+//    private void splitPdf() {
+//        if(pdfUri!=null) {
+//            if (adapter.areAllRangeValid()) {
+//                ArrayList<RangeModel> list = adapter.getArrayList();
+//                try {
+//                    PdfReader reader = new PdfReader(getContentResolver().openInputStream(pdfUri));
+//                    for (int i = 0; i < list.size(); i++) {
+//                        Document document = new Document();
+//                        PdfCopy writer = new PdfCopy(document, new FileOutputStream(Constants.PDF_STORAGE_PATH + System.currentTimeMillis() + ".pdf"));
+//                        document.open();
+//                        for (int j = list.get(i).fromRange; j <= list.get(i).toRange; j++) {
+//                            PdfImportedPage page = writer.getImportedPage(reader, j);
+//                            writer.addPage(page);
+//                        }
+//                        document.close();
+//                        writer.close();
+//                        View parentLayout = findViewById(android.R.id.content);
+//                        Snackbar.make(parentLayout, "PDF saved to " + Constants.PDF_STORAGE_PATH + System.currentTimeMillis() + ".pdf", Snackbar.LENGTH_LONG).show();
+//                    }
+//                    reader.close();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            } else {
+//                View parentLayout = findViewById(android.R.id.content);
+//                Snackbar.make(parentLayout, "Invalid Ranges To proceed", Snackbar.LENGTH_LONG).show();
+//            }
+//        }
+//        else{
+//            View parentLayout = findViewById(android.R.id.content);
+//            Snackbar.make(parentLayout, "Please Select a PDF", Snackbar.LENGTH_LONG).show();
+//        }
+//    }
 
     private void refreshPage() {
         adapter = new PdfRangeAdapter(getApplicationContext(), arrayList, new OnStartDragListener() {
@@ -186,6 +328,7 @@ public class SplitPDFActivity extends AppCompatActivity {
         done = findViewById(R.id.fab_done_split);
         textView = findViewById(R.id.selected_pdf);
         addPdf = findViewById(R.id.fab_operation_split_pdf);
+        empty_image = findViewById(R.id.empty_image_split);
     }
 
     private class RangeModel {
@@ -215,14 +358,11 @@ public class SplitPDFActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull final MyHolder holder, final int position) {
             arrayList.get(position).fromRange = 0;
             arrayList.get(position).toRange = 0;
-            holder.dragHandle.setOnTouchListener(new View.OnTouchListener() {
+            holder.dragHandle.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (MotionEventCompat.getActionMasked(event) ==
-                            MotionEvent.ACTION_DOWN) {
-                        mDragStartListener.onStartDrag(holder);
-                    }
-                    return true;
+                public void onClick(View v) {
+                    arrayList.remove(position);
+                    refreshPage();
                 }
             });
 
@@ -422,4 +562,85 @@ public class SplitPDFActivity extends AppCompatActivity {
         boolean onItemMove(int fromPosition, int toPosition);
         void onItemDismiss(int position);
     }
+
+    public class SplitPdfTask extends AsyncTask<Void, Void, Void> {
+        AlertDialog dialog;
+        Context context;
+        SplitPdfTask(Context context) {
+            this.context = context;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog = new AlertDialog.Builder(context).setCancelable(false).setView(R.layout.layout_loading_dialog).create();
+            dialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            splitPDF();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            dialog.dismiss();
+        }
+
+        private void splitPDF() {
+            if(pdfUri!=null) {
+                if (adapter.areAllRangeValid()) {
+                    ArrayList<RangeModel> list = adapter.getArrayList();
+                    try {
+                        PDDocument doc = PDDocument.load(getContentResolver().openInputStream(pdfUri));
+
+                        final String foldername = DateTimeUtils.getDateTime() + "_" + System.currentTimeMillis() + "/";
+                        File f = new File(Constants.PDF_SPLIT_PATH + foldername);
+                        if(!f.exists()) f.mkdirs();
+                        System.out.println(f.getAbsolutePath());
+                        for (int i = 0; i < list.size(); i++) {
+                            String pdfName = "Split_" + System.currentTimeMillis() + ".pdf";
+                            Splitter splitter = new Splitter();
+
+                            splitter.setStartPage(list.get(i).fromRange);
+                            splitter.setEndPage(list.get(i).toRange);
+                            splitter.setSplitAtPage(list.get(i).toRange);
+
+                            List<PDDocument> docs = splitter.split(doc);
+                            System.out.println("List size = " + docs.size());
+                            docs.get(0).save(Constants.PDF_SPLIT_PATH + foldername + pdfName);
+                            docs.get(0).close();
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, "PDF Saved in " + foldername, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, "Failed To Split", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                } else {
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Invalid Ranges To proceed", Snackbar.LENGTH_LONG).show();
+                }
+            }
+            else{
+                View parentLayout = findViewById(android.R.id.content);
+                Snackbar.make(parentLayout, "Please Select a PDF", Snackbar.LENGTH_LONG).show();
+            }
+        }
+
+
+
+    }
+
 }
