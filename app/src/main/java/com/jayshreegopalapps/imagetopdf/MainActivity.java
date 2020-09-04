@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     private static final int RESULT_PDF_SPLIT = 8;
     private static final int RESULT_COMPRESS_PDF = 9;
     private static final int RESULT_ADD_PAGE = 10;
+    private static final int REQUEST_CUSTOM_CAMERA = 11;
 
     enum recycler_mode {
             MODE_GRID,
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     HashMap<Integer, String> selectedItems;
     SharedPreferences prefs = null;
     int paddingBottomRecyclerView;
+    private boolean isOpen = false;
 //    private InterstitialAd interstitialAd;
     MenuItem renameItem;
     RelativeLayout imageView_empty;
@@ -158,16 +160,16 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 
                 if ((ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.CAMERA) ==
-                        PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
+                        PackageManager.PERMISSION_GRANTED)&& (ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                        PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
+                        PackageManager.PERMISSION_GRANTED)&& (ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                         PackageManager.PERMISSION_GRANTED)) {
-                    int REQUEST_CODE = 0;
-                    int preference = ScanConstants.OPEN_CAMERA;
-                    Intent intent = new Intent(getApplicationContext(), ScanActivity.class);
-                    intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, preference);
-                    startActivityForResult(intent, REQUEST_CODE);
+
+                    Intent customCamera = new Intent(MainActivity.this, CustomCameraActivity.class);
+                    startActivityForResult(customCamera, REQUEST_CUSTOM_CAMERA);
+
+
                 }
                 else {
                     askPermissions();
@@ -277,8 +279,12 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
-            createDirs();
+        if(grantResults.length >= 1) {
+            if (permissions.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                if (grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                    createDirs();
+                }
+            }
         }
     }
 
@@ -833,6 +839,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     Uri uri = data.getData();
                     convertToImages(uri);
 
+
                 }
             }
         }
@@ -851,6 +858,20 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //                        e.printStackTrace();
 //                    }
                 }
+            }
+        }
+        if(requestCode == REQUEST_CUSTOM_CAMERA && resultCode == RESULT_OK) {
+            if(data!=null) {
+
+                String s = data.getStringExtra("location");
+
+                int REQUEST_CODE = 0;
+                int preference = ScanConstants.OPEN_CAMERA;
+                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+                intent.putExtra("location" , s);
+                intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, preference);
+                startActivityForResult(intent, REQUEST_CODE);
+
             }
         }
         if(requestCode == RESULT_COMPRESS_PDF) {

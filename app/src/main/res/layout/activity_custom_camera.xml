@@ -1,29 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CustomCameraActivity">
 
+
     <FrameLayout
         android:id="@+id/custom_camera_frame"
+        android:layout_centerInParent="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
+    <RelativeLayout
+        android:background="@color/colorPrimary"
+        android:id="@+id/custom_camera_top"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <ImageView
+            android:id="@+id/custom_camera_flash"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_flash_off_black_24dp"
+            android:layout_margin="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
     <ImageView
         android:id="@+id/custom_camera_image"
+        android:layout_marginTop="20dp"
         android:visibility="invisible"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <Button
-        android:id="@+id/custom_camera_capture"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:text="capture"
+        android:layout_centerInParent="true"
+        android:src="@drawable/loading_image"
+        android:scaleType="fitCenter"
+        android:layout_below="@id/custom_camera_top"
+        android:layout_above="@+id/custom_camera_capture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+        <ImageView
+            android:id="@+id/custom_camera_capture"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/open_camera"
+            android:layout_width="100dp"
+            android:layout_height="100dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/custom_camera_rotate_left"
+        android:visibility="invisible"
+        android:src="@drawable/ic_rotate_left_black_24dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@id/custom_camera_capture"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/custom_camera_back"
+        android:visibility="invisible"
+        android:src="@drawable/ic_undo_black_24dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/custom_camera_rotate_right"
+        android:src="@drawable/ic_rotate_right_black_24dp"
+        android:visibility="invisible"
+        android:layout_toEndOf="@+id/custom_camera_capture"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/custom_camera_next"
+        android:src="@drawable/ic_done_black_24dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</RelativeLayout>

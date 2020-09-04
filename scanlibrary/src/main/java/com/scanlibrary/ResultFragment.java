@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -61,14 +62,19 @@ public class ResultFragment extends Fragment {
 
     private Bitmap getBitmap() {
         Uri uri = getUri();
+//        String location = getLocation();
         try {
             original = Utils.getBitmap(getActivity(), uri);
-            getActivity().getContentResolver().delete(uri, null, null);
-            return original;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+//        original = Utils.getBitmap(getActivity(), location);
+            getActivity().getContentResolver().delete(uri, null, null);
+        return original;
+    }
+
+    private String getLocation() {
+        return getArguments().getString("location");
     }
 
     private Uri getUri() {

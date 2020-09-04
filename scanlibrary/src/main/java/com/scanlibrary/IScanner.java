@@ -10,4 +10,7 @@ public interface IScanner {
     void onBitmapSelect(Uri uri);
 
     void onScanFinish(Uri uri);
+
+    void onScanFinish(String string);
+
 }

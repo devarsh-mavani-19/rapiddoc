@@ -2,6 +2,7 @@ package com.scanlibrary;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 
@@ -22,6 +23,11 @@ public class Utils {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
         String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, System.currentTimeMillis() + "", null);
         return Uri.parse(path);
+    }
+
+    public static Bitmap getBitmap(Context context, String location) {
+        Bitmap bitmap = BitmapFactory.decodeFile(location);
+        return bitmap;
     }
 
     public static Bitmap getBitmap(Context context, Uri uri) throws IOException {

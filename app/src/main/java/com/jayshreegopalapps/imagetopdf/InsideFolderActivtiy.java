@@ -65,6 +65,7 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
     int imageCountOfCurrentFolder;
     DatabaseManagment fileTable;
     boolean isInMultiSelecMode = false;
+    private static int REQUEST_CUSTOM_CAMERA = 100;
 //    private InterstitialAd interstitialAd;
 
     @Override
@@ -141,11 +142,11 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
                 if(!askPermissions()) {
                     return;
                 }
-                int REQUEST_CODE = 1;
-                int preference = ScanConstants.OPEN_CAMERA;
-                Intent intent = new Intent(getApplicationContext(), ScanActivity.class);
-                intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, preference);
-                startActivityForResult(intent, REQUEST_CODE);
+
+                Intent i = new Intent(InsideFolderActivtiy.this, CustomCameraActivity.class);
+                startActivityForResult(i, REQUEST_CUSTOM_CAMERA);
+
+
 
 
 //                interstitialAd.setAdListener(new AdListener() {
@@ -568,6 +569,19 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
 //        if(interstitialAd.isLoaded()) {
 //            interstitialAd.show();
 //        }
+        if(requestCode == REQUEST_CUSTOM_CAMERA && resultCode==RESULT_OK) {
+            String location = null;
+            if (data != null) {
+                location = data.getStringExtra("location");
+                int REQUEST_CODE = 1;
+                int preference = ScanConstants.OPEN_CAMERA;
+                Intent intent = new Intent(getApplicationContext(), ScanActivity.class);
+                intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, preference);
+                intent.putExtra("location", location);
+                startActivityForResult(intent, REQUEST_CODE);
+            }
+
+        }
         if (requestCode == 1) {
             Bitmap image = null;
             if (data != null) {

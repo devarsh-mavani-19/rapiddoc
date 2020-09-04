@@ -47,7 +47,7 @@ public class PdfConverterBox {
                     document.addPage(page);
                     PDImageXObject image = PDImageXObject.createFromFile(context.getExternalFilesDir(null) + "/" + cursor.getString(0), document);
                     PDPageContentStream contentStream = new PDPageContentStream(document,page);
-                    contentStream.drawImage(image, 0, 0, PDRectangle.A4.getWidth(), PDRectangle.A4.getHeight());
+                    contentStream.drawImage(image, 50, 50, PDRectangle.A4.getWidth() - 50, PDRectangle.A4.getHeight() - 50);
                     contentStream.close();
                 }
                 while(cursor.moveToNext());

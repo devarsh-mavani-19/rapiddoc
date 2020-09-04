@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -78,12 +79,13 @@ public class ScanFragment extends Fragment {
     }
 
     private Bitmap getBitmap() {
-        Uri uri = getUri();
+//        Uri uri = getUri();
+        String loc = getArguments().getString("location");
         try {
-            Bitmap bitmap = Utils.getBitmap(getActivity(), uri);
-            getActivity().getContentResolver().delete(uri, null, null);
-            return bitmap;
-        } catch (IOException e) {
+            //            Bitmap bitmap = Utils.getBitmap(getActivity(), uri);
+//            getActivity().getContentResolver().delete(uri, null, null);
+            return BitmapFactory.decodeFile(loc);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

@@ -17,7 +17,8 @@ public class ScanActivity extends Activity implements IScanner, ComponentCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan_layout);
-        init();
+        String u = getIntent().getStringExtra("location");
+        init3(u);
     }
 
     private void init() {
@@ -28,6 +29,32 @@ public class ScanActivity extends Activity implements IScanner, ComponentCallbac
         android.app.FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.content, fragment);
+        fragmentTransaction.commit();
+    }
+
+    private void init2(String string) {
+        ResultFragment fragment = new ResultFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("location", string);
+//        bundle.putParcelable(ScanConstants.SCANNED_RESULT, uri);
+        fragment.setArguments(bundle);
+        android.app.FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.content, fragment);
+        fragmentTransaction.addToBackStack(ResultFragment.class.toString());
+        fragmentTransaction.commit();
+    }
+
+    private void init3(String string) {
+        ScanFragment fragment = new ScanFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("location", string);
+//        bundle.putString(ScanConstants.SELECTED_BITMAP, uri);
+        fragment.setArguments(bundle);
+        android.app.FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content, fragment);
+        fragmentTransaction.addToBackStack(ScanFragment.class.toString());
         fragmentTransaction.commit();
     }
 
@@ -48,6 +75,7 @@ public class ScanActivity extends Activity implements IScanner, ComponentCallbac
         fragmentTransaction.commit();
     }
 
+    //original onScanFinish
     @Override
     public void onScanFinish(Uri uri) {
         ResultFragment fragment = new ResultFragment();
@@ -59,6 +87,26 @@ public class ScanActivity extends Activity implements IScanner, ComponentCallbac
         fragmentTransaction.add(R.id.content, fragment);
         fragmentTransaction.addToBackStack(ResultFragment.class.toString());
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onScanFinish(String string) {
+        ResultFragment fragment = new ResultFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("location", string);
+//        bundle.putParcelable(ScanConstants.SCANNED_RESULT, uri);
+        fragment.setArguments(bundle);
+        android.app.FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.content, fragment);
+        fragmentTransaction.addToBackStack(ResultFragment.class.toString());
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 
     @Override
