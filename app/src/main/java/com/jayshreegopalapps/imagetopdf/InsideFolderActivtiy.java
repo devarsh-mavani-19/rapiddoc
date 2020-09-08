@@ -332,6 +332,7 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
                 docsFolder.mkdir();
             }
         }
+        recycleAdapter.notifyDataSetChanged();
     }
 
     private void downloadImage(String imageName) {
@@ -486,19 +487,18 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
 
 //            Intent intent = new Intent();
 //            intent.setType("image/*");
-//            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
 //            intent.setAction(Intent.ACTION_GET_CONTENT);
-//            startActivityForResult(Intent.createChooser(intent,"Select Picture"), 2);
+//            startActivityForResult(Intent.createChooser(intent,"Select Picture"), 88);
         }
-        if (id == R.id.inside_folder_copy) {
-            setToMultiSelectMode();
-            operation = multiSelectOperations.COPY_IMAGES;
-        }
-
-        if (id == R.id.inside_folder_move) {
-            setToMultiSelectMode();
-            operation = multiSelectOperations.CUT_IMAGES;
-        }
+//        if (id == R.id.inside_folder_copy) {
+//            setToMultiSelectMode();
+//            operation = multiSelectOperations.COPY_IMAGES;
+//        }
+//
+//        if (id == R.id.inside_folder_move) {
+//            setToMultiSelectMode();
+//            operation = multiSelectOperations.CUT_IMAGES;
+//        }
 
         if(id == R.id.inside_folder_delete) {
             setToMultiSelectMode();
@@ -817,6 +817,9 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
                     Toast.makeText(this, "Failed To Copy to " + data.getStringExtra("result"), Toast.LENGTH_SHORT).show();
                 }
             }
+        }
+        if(requestCode == 88 && resultCode == RESULT_OK) {
+
         }
     if(requestCode == 4) {
             if(data!=null) {

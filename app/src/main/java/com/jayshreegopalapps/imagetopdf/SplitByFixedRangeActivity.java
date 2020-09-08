@@ -306,8 +306,15 @@ public class SplitByFixedRangeActivity extends AppCompatActivity {
         }
 
         private void splitPDF() {
+
             if(editText.getText().toString().equals("")) {
-                editText.setError("Must be non-empty");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        editText.setError("Must be non-empty");
+
+                    }
+                });
             }
             else{
                 try {
@@ -349,11 +356,22 @@ public class SplitByFixedRangeActivity extends AppCompatActivity {
                         }
                     }
                     else{
-                        Toast.makeText(context, "Must be a greater than 0", Toast.LENGTH_SHORT).show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, "Must be a greater than 0", Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
                     }
                 }
                 catch (Exception e) {
-                    Toast.makeText(context, "Must be a number", Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, "Must be a number", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     e.printStackTrace();
                 }
             }

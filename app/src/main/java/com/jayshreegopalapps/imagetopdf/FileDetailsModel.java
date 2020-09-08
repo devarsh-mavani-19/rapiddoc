@@ -19,8 +19,12 @@ public class FileDetailsModel {
         databaseManagment.useTable("FileDetails");
         Cursor cursor = databaseManagment.prepare().where("parent", "=", "'" + parentFolderName + "'").and().where("type","=","'FILE'").select(new String[]{"count(*)"});
         if(cursor.moveToNext()) {
-            return cursor.getInt(0);
+            int yo = cursor.getInt(0);
+            cursor.close();
+            return yo;
         }
+        cursor.close();
+
         return 0;
     }
 
@@ -29,8 +33,11 @@ public class FileDetailsModel {
         databaseManagment.useTable("FileDetails");
         Cursor cursor = databaseManagment.prepare().where("parent", "=", "'" + parentFolderName + "'").and().where("type", "=", "'FILE'").and().where("orderno", "=", "1").select(new String[]{"name"});
         if(cursor.moveToNext()) {
-            return cursor.getString(0);
+            String yo = cursor.getString(0);
+            cursor.close();
+            return yo;
         }
+        cursor.close();
         return "";
     }
 

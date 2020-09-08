@@ -146,8 +146,8 @@ public class CustomCameraActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         Matrix mat = new Matrix();
                          mat.postRotate(-90.0f);
-                        b[0] = Bitmap.createBitmap(b[0], 0, 0, b[0].getWidth(), b[0].getHeight(), mat, true);
-                        imageView.setImageBitmap(b[0]);
+                       n[0] = Bitmap.createBitmap(n[0], 0, 0, n[0].getWidth(), n[0].getHeight(), mat, true);
+                        imageView.setImageBitmap(n[0]);
                     }
                 });
                 right.setOnClickListener(new View.OnClickListener() {
@@ -155,8 +155,8 @@ public class CustomCameraActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         Matrix mat = new Matrix();
                         mat.postRotate(90.0f);
-                        b[0] = Bitmap.createBitmap(b[0], 0, 0, b[0].getWidth(), b[0].getHeight(), mat, true);
-                        imageView.setImageBitmap(b[0]);
+                        n[0] = Bitmap.createBitmap(n[0], 0, 0, n[0].getWidth(), n[0].getHeight(), mat, true);
+                        imageView.setImageBitmap(n[0]);
                     }
                 });
             } catch (Exception e) {

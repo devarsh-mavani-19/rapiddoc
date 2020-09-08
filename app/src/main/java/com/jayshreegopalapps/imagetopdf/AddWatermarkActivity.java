@@ -16,6 +16,7 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -56,6 +57,7 @@ public class AddWatermarkActivity extends AppCompatActivity {
         }
 
         if(editText.getText().toString().equals("")){
+            Toast.makeText(this, "Select A PDF", Toast.LENGTH_SHORT).show();
             editText.setError("Enter Watermark Text");
             return;
         }

@@ -42,6 +42,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -51,6 +53,7 @@ import android.widget.Toast;
 
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -80,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     CheckBox check;
     ImageView empty_image;
     private RecyclerView recyclerView;
-    private FloatingActionButton fab, fab2, fab3;
+    private FloatingActionButton fab, fab2, fab3, fab_opener;
     LinearLayout bottomNavigationView;
     ArrayList<FileDetailsModel> arrayList = new ArrayList<>();
     RecycleAdapter recycleAdapter;
@@ -94,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //    private InterstitialAd interstitialAd;
     MenuItem renameItem;
     RelativeLayout imageView_empty;
+    private Animation fab_clock, fab_anticlock;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,8 +149,41 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         extractBundle();
         //reset to defaults
         resetLayoutToDefault();
-
+        fab_clock = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fab_rotate);
+        fab_anticlock = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fab_rotate_anticlock);
         //on click handlers
+        fab_opener.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+
+                if(isOpen) {
+                    //close
+                    fab_opener.startAnimation(fab_anticlock);
+                    fab.animate().translationY(0);
+                    fab2.animate().translationY(0);
+                    fab3.animate().translationY(0);
+                    fab.setClickable(false);
+                    fab2.setClickable(false);
+                    fab3.setClickable(false);
+                    isOpen = false;
+                }
+                else  {
+                    //open
+
+                    fab_opener.startAnimation(fab_clock);
+                    fab.animate().translationY(-getResources().getDimension(R.dimen.standard_55));
+                    fab2.animate().translationY(-getResources().getDimension(R.dimen.standard_105));
+                    fab3.animate().translationY(-getResources().getDimension(R.dimen.standard_155));
+                    fab.setClickable(true);
+                    fab2.setClickable(true);
+                    fab3.setClickable(true);
+                    isOpen = true;
+
+                }
+            }
+        });
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -388,6 +425,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         fab = findViewById(R.id.fab);
         fab2 = findViewById(R.id.fab_pdf);
         fab3 = findViewById(R.id.fab_qr);
+        fab_opener = findViewById(R.id.open_main);
         toolbar = findViewById(R.id.toolbar);
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
         paddingBottomRecyclerView = recyclerView.getPaddingBottom();
@@ -403,6 +441,15 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         copyMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(recycleAdapter.getSelectedItems().size() == 0) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Please Select a Folder", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    return;
+                }
                 Intent navIntent = new Intent(getApplicationContext(), NavigateAllFolders.class);
                 startActivityForResult(navIntent, 3);
 //                CustomBottomModalSheetFragment customBottomModalSheetFragment = new CustomBottomModalSheetFragment(selectedItems, 1);
@@ -414,6 +461,15 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             @Override
             public void onClick(View v) {
                 HashMap<Integer, String> selectedItems = recycleAdapter.getSelectedItems();
+                if(selectedItems.size() == 0) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Please Select a Folder", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    return;
+                }
 //                CustomBottomModalSheetFragment customBottomModalSheetFragment = new CustomBottomModalSheetFragment(selectedItems, 0);
 //                customBottomModalSheetFragment.show(getSupportFragmentManager(), null);
                 Intent navIntent = new Intent(getApplicationContext(), NavigateAllFolders.class);
@@ -426,7 +482,15 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             public void onClick(View v) {
 
                 selectedItems = recycleAdapter.getSelectedItems();
-
+                if(selectedItems.size() == 0) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Please Select a Folder", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    return;
+                }
                 for(Integer i : selectedItems.keySet()) {
 
                     String query = "select * from FileDetails where parent = '" + selectedItems.get(i) + "'";
@@ -528,6 +592,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         fab.hide();
         fab2.hide();
         fab3.hide();
+        fab_opener.hide();
         //change action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         isInMultiSelectMode = true;
@@ -908,14 +973,14 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     protected void onResume() {
         super.onResume();
         resetLayoutToDefault();
-        if (prefs.getBoolean("update6", true)) {
+        if (prefs.getBoolean("fab_opener", true)) {
             // Do first run stuff here then set 'firstrun' as false
             // using the following line to edit/commit prefs
-            prefs.edit().putBoolean("update6", false).commit();
+            prefs.edit().putBoolean("fab_opener", false).commit();
 
 
             FancyShowCaseView fancyShowCaseView1 =new FancyShowCaseView.Builder(this)
-                    .focusOn(fab)
+                    .focusOn(fab_opener)
                     .title(" \n           " +
                             "\n   " +
                             "\n" +
@@ -923,28 +988,10 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                             "\n" +
                             "\n" +
                             "\n"+
-                            "Capture Image")
+                            "Show PDF tools")
 
                     .build();
 
-            FancyShowCaseView fancyShowCaseView3 =new FancyShowCaseView.Builder(this)
-                    .focusOn(fab3)
-                    .title(" \n           " +
-                            "\n   " +
-                            "\n" +
-                            "\n" +
-                            "\n" +
-                            "\n" +
-                            "\n"+
-                            "Scan QR or barcode")
-
-                    .build();
-
-            FancyShowCaseView fancyShowCaseView2 =new FancyShowCaseView.Builder(this)
-                    .focusOn(fab2)
-                    .title("PDF tools")
-                    .build()
-                    ;
            /* new FancyShowCaseView.Builder(this)
                     .focusOn(getSupportActionBar().getCustomView().findViewById(R.menu.menu_main))
                     .title("Focus on View")
@@ -952,8 +999,6 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     .show();*/
             new FancyShowCaseQueue()
                     .add(fancyShowCaseView1)
-                    .add(fancyShowCaseView2)
-                    .add(fancyShowCaseView3)
                     .show();
             File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
             if (!docsFolder.exists()) {
@@ -1167,6 +1212,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         fab.show();
         fab2.show();
         fab3.show();
+        fab_opener.show();
         bottomNavigationView.setVisibility(View.INVISIBLE);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         isInMultiSelectMode = false;
@@ -1274,19 +1320,39 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         if(cursor1.moveToNext()) {
             do{
 
-                ArrayList<String> stringArrayList = new ArrayList<>();
 
-                String creationTime = DateTimeUtils.getDate();
 
-                stringArrayList.add("'" + cursor1.getString(0) + "'");
-                stringArrayList.add("'" + cursor1.getString(1) + "'");
-                stringArrayList.add("'" + newParentFolder + "'");
-                stringArrayList.add("'" + cursor1.getString(3) + "'");
-                stringArrayList.add("" + cursor1.getInt(4));
-                stringArrayList.add("'" + cursor1.getString(5) + "'");
-                stringArrayList.add("'" + creationTime + "'");
-                stringArrayList.add("'" + creationTime + "'");
-                filesTable.insertRecord(stringArrayList);
+                try {
+                    ArrayList<String> stringArrayList = new ArrayList<>();
+                    String creationTime = DateTimeUtils.getDate();
+
+                    String fName = System.currentTimeMillis() + "";
+
+                    FileInputStream fis = new FileInputStream(getExternalFilesDir(null) + "/" + cursor1.getString(0));
+                    FileOutputStream fos = new FileOutputStream(getExternalFilesDir(null) + "/" + fName + ".png");
+
+                    int x;
+                    byte[] buf=new byte[1024];
+                    while ((x = fis.read(buf))!=-1) {
+                        fos.write(buf,0,x);
+                    }
+
+                    fos.close();
+                    fis.close();
+
+                    stringArrayList.add("'" + fName + ".png'");
+                    stringArrayList.add("'" + cursor1.getString(1) + "'");
+                    stringArrayList.add("'" + newParentFolder + "'");
+                    stringArrayList.add("'" + cursor1.getString(3) + "'");
+                    stringArrayList.add("" + cursor1.getInt(4));
+                    stringArrayList.add("'" + cursor1.getString(5) + "'");
+                    stringArrayList.add("'" + creationTime + "'");
+                    stringArrayList.add("'" + creationTime + "'");
+                    filesTable.insertRecord(stringArrayList);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
             while(cursor1.moveToNext());
         }

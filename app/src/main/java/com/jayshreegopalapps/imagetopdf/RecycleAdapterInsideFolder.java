@@ -3,6 +3,8 @@ package com.jayshreegopalapps.imagetopdf;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.view.LayoutInflater;

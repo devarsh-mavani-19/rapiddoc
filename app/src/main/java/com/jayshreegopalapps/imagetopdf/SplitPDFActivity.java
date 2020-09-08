@@ -476,6 +476,15 @@ public class SplitPDFActivity extends AppCompatActivity {
         }
 
         boolean areAllRangeValid() {
+            if(arrayList.isEmpty()) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, "Please Add At least One Range", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return false;
+            }
             for(int i =0;i<arrayList.size();i++) {
                 if(arrayList.get(i).fromRange > arrayList.get(i).toRange) {
                     System.out.println("from  > to");

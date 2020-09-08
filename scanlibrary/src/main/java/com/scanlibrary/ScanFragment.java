@@ -78,7 +78,26 @@ public class ScanFragment extends Fragment {
         });
     }
 
+    private Bitmap getBitmap(int x) {
+
+        Uri uri = getUri();
+//        String loc = getArguments().getString("location");
+        try {
+            Bitmap bitmap = Utils.getBitmap(getActivity(), uri);
+            getActivity().getContentResolver().delete(uri, null, null);
+            return bitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private Bitmap getBitmap() {
+
+        if(getArguments().getString("type").equals("media")) {
+            return getBitmap(1);
+        }
+
 //        Uri uri = getUri();
         String loc = getArguments().getString("location");
         try {

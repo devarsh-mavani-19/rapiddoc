@@ -17,8 +17,13 @@ public class ScanActivity extends Activity implements IScanner, ComponentCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan_layout);
-        String u = getIntent().getStringExtra("location");
-        init3(u);
+        if(getIntent().getIntExtra(ScanConstants.OPEN_INTENT_PREFERENCE, -1) == (ScanConstants.OPEN_MEDIA)) {
+            init();
+        }
+        else {
+            String u = getIntent().getStringExtra("location");
+            init3(u);
+        }
     }
 
     private void init() {
@@ -49,6 +54,7 @@ public class ScanActivity extends Activity implements IScanner, ComponentCallbac
         ScanFragment fragment = new ScanFragment();
         Bundle bundle = new Bundle();
         bundle.putString("location", string);
+        bundle.putString("type", "camera");
 //        bundle.putString(ScanConstants.SELECTED_BITMAP, uri);
         fragment.setArguments(bundle);
         android.app.FragmentManager fragmentManager = getFragmentManager();
@@ -67,6 +73,7 @@ public class ScanActivity extends Activity implements IScanner, ComponentCallbac
         ScanFragment fragment = new ScanFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(ScanConstants.SELECTED_BITMAP, uri);
+        bundle.putString("type", "media");
         fragment.setArguments(bundle);
         android.app.FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

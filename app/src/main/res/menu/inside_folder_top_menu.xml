@@ -38,17 +38,17 @@
             android:title="Save in gallery"
             app:showAsAction="never" />
 
-        <item
-            android:id="@+id/inside_folder_move"
-            android:icon="@drawable/ic_content_cut_black2_24dp"
-            android:title="cut"
-            app:showAsAction="never" />
+<!--        <item-->
+<!--            android:id="@+id/inside_folder_move"-->
+<!--            android:icon="@drawable/ic_content_cut_black2_24dp"-->
+<!--            android:title="cut"-->
+<!--            app:showAsAction="never" />-->
 
-        <item
-            android:id="@+id/inside_folder_copy"
-            android:icon="@drawable/ic_content_copy_black2_24dp"
-            android:title="copy"
-            app:showAsAction="never" />
+<!--        <item-->
+<!--            android:id="@+id/inside_folder_copy"-->
+<!--            android:icon="@drawable/ic_content_copy_black2_24dp"-->
+<!--            android:title="copy"-->
+<!--            app:showAsAction="never" />-->
 
         <item
             android:id="@+id/inside_folder_delete"

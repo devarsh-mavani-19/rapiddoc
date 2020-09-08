@@ -45,7 +45,7 @@
         android:layout_gravity="bottom|end"
         app:backgroundTint="@color/colorPrimary"
         android:layout_marginRight="28dp"
-        android:layout_marginBottom="172dp"
+        android:layout_marginBottom="28dp"
         app:srcCompat="@drawable/qrcode" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -57,7 +57,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="28dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="28dp"
         app:srcCompat="@drawable/ic_picture_as_pdf_black_24dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -70,6 +70,16 @@
         android:layout_marginRight="28dp"
         android:layout_marginBottom="28dp"
         app:srcCompat="@drawable/ic_done_black_24dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/open_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        app:backgroundTint="@color/colorPrimary"
+        android:layout_marginRight="28dp"
+        android:layout_marginBottom="28dp"
+        app:srcCompat="@drawable/ic_code_black_24dp" />
 
 <!--    <com.google.android.material.bottomnavigation.BottomNavigationView-->
 <!--        android:id="@+id/bottom_nav_view"-->
