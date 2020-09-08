@@ -3,12 +3,12 @@
     package="com.jayshreegopalapps.imagetopdf">
 
     <uses-permission android:name="android.permission.FLASHLIGHT" />
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
@@ -20,8 +20,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".CustomCameraActivity"></activity>
+        <activity android:name=".EsignatureActivity"></activity>
+        <activity android:name=".CustomCameraActivity" />
         <activity android:name=".OpenPDFActivity" />
         <activity android:name=".AddWatermarkActivity" />
         <activity android:name=".ImageInPDFActivity" />
@@ -46,6 +46,7 @@
         <activity android:name=".SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     private static final int RESULT_COMPRESS_PDF = 9;
     private static final int RESULT_ADD_PAGE = 10;
     private static final int REQUEST_CUSTOM_CAMERA = 11;
+    private int REQUEST_ESIGNATURE = 12;
 
     enum recycler_mode {
             MODE_GRID,
@@ -226,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 Chip pdf_to_image_ = a.findViewById(R.id.pdf_to_image);
                 Chip pdf_merge_ = a.findViewById(R.id.pdf_merge);
                 Chip pdf_split_ = a.findViewById(R.id.pdf_split);
-
+                Chip esignature = a.findViewById(R.id.esignature);
                 //Chip pdf_watermark_  = a.findViewById(R.id.pdf_watermark);
                 final Chip split_by_fixed_range_ = a.findViewById(R.id.split_by_fixed_range);
                 final Chip compress_pdf_ = a.findViewById(R.id.compress_pdf);
@@ -242,6 +243,17 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //                });
 
 
+                esignature.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                        i.setType("application/pdf");
+                        i.addCategory(Intent.CATEGORY_OPENABLE);
+                        startActivityForResult(i, REQUEST_ESIGNATURE);
+//                        Intent i = new Intent(MainActivity.this, EsignatureActivity.class);
+//                        startActivityForResult(i, REQUEST_ESIGNATURE);
+                    }
+                });
 
                 pdf_merge_.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -332,6 +344,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         File f3 = new File(Constants.PDF_SPLIT_PATH);
         File f4 = new File(Constants.PDF_WATERMARK_PATH);
         File f5 = new File(Constants.PDF_STORAGE_PATH);
+        File f6 = new File(Constants.ESIGNATURE_PATH);
 
         if(!f.exists()) {
             f.mkdirs();
@@ -347,6 +360,9 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         }
         if(!f5.exists()) {
             f5.mkdirs();
+        }
+        if(!f6.exists()) {
+            f6.mkdirs();
         }
     }
 
@@ -961,6 +977,13 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //                    }
                 }
             }
+        }
+        if(requestCode == REQUEST_ESIGNATURE && resultCode == RESULT_OK) {
+            Uri uri = data.getData();
+            Intent i = new Intent(MainActivity.this, OpenPDFActivity.class);
+            System.out.println(uri);
+            i.setDataAndType(uri, "application/pdf");
+            startActivity(i);
         }
     }
 

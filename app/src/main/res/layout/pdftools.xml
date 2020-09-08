@@ -162,6 +162,34 @@ android:gravity="center"
                 />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:paddingBottom="15dp"
+            android:paddingTop="15dp"
+            android:gravity="center"
+            android:layout_height="wrap_content">
+
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/esignature"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:fontFamily="@font/arbutusslabregular"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="Esignature"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimaryDark"
+                android:theme="@style/Theme.MaterialComponents.Light"
+                app:chipIcon="@drawable/ic_picture_as_pdf_black_24dp"
+                app:chipIconTint="@color/colorPrimaryDark"
+                app:chipIconVisible="false"
+                app:chipStrokeColor="@color/colorPrimaryDark"
+                app:rippleColor="@color/colorAccent" />
+        </LinearLayout>
 
 </LinearLayout>
 </LinearLayout>

@@ -12,5 +12,7 @@ public class Constants {
     public static String PDF_SPLIT_PATH = PDF_STORAGE_PATH + "Split/";
     public static String PDF_WATERMARK_PATH = PDF_STORAGE_PATH + "Watermark/";
     public static String PDF_PATH = PDF_STORAGE_PATH + "PDF/";
+    public static String ESIGNATURE_PATH = PDF_STORAGE_PATH + "ESIGNATURE/";
+
 
 }
