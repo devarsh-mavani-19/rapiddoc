@@ -2,6 +2,7 @@ package com.jayshreegopalapps.imagetopdf;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -24,6 +25,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 //import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
 import com.scanlibrary.ScanActivity;
 import com.scanlibrary.ScanConstants;
+import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.pdmodel.encryption.AccessPermission;
+import com.tom_roush.pdfbox.pdmodel.encryption.PDEncryption;
+import com.tom_roush.pdfbox.pdmodel.encryption.PDEncryptionDictionary;
+import com.tom_roush.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
+import com.tom_roush.pdfbox.text.PDFTextStripper;
 import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
 import androidx.annotation.NonNull;
@@ -73,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     private static final int RESULT_ADD_PAGE = 10;
     private static final int REQUEST_CUSTOM_CAMERA = 11;
     private int REQUEST_ESIGNATURE = 12;
+    private int REQUEST_ENCRYPT = 13;
+    private int REQUEST_EXTRACT_TEXT_PDF = 14;
 
     enum recycler_mode {
             MODE_GRID,
@@ -227,7 +236,13 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 Chip pdf_to_image_ = a.findViewById(R.id.pdf_to_image);
                 Chip pdf_merge_ = a.findViewById(R.id.pdf_merge);
                 Chip pdf_split_ = a.findViewById(R.id.pdf_split);
-                Chip esignature = a.findViewById(R.id.esignature);
+//                Chip esignature = a.findViewById(R.id.esignature);
+                Chip encrypt = a.findViewById(R.id.encrypt);
+                Chip ocr = a.findViewById(R.id.ocr);
+                final Chip extractText = a.findViewById(R.id.extract_text_from_pdf);
+                final Chip idcard = a.findViewById(R.id.idcard);
+                final Chip pageno = a.findViewById(R.id.pageno);
+
                 //Chip pdf_watermark_  = a.findViewById(R.id.pdf_watermark);
                 final Chip split_by_fixed_range_ = a.findViewById(R.id.split_by_fixed_range);
                 final Chip compress_pdf_ = a.findViewById(R.id.compress_pdf);
@@ -241,19 +256,60 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //                        startActivity(i);
 //                    }
 //                });
+                pageno.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(MainActivity.this, PageNumberActivity.class);
+                        startActivity(i);
+                    }
+                });
+                idcard.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(MainActivity.this, IDCardActivity.class);
+                        startActivity(i);
+                    }
+                });
+                extractText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                        i.setType("application/pdf");
+                        startActivityForResult(i, REQUEST_EXTRACT_TEXT_PDF);
+                        a.dismiss();
+                    }
+                });
+                ocr.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(MainActivity.this, OCRActivity.class);
+                        startActivity(i);
+                        a.dismiss();
+                    }
+                });
 
-
-                esignature.setOnClickListener(new View.OnClickListener() {
+                encrypt.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                         i.setType("application/pdf");
                         i.addCategory(Intent.CATEGORY_OPENABLE);
-                        startActivityForResult(i, REQUEST_ESIGNATURE);
-//                        Intent i = new Intent(MainActivity.this, EsignatureActivity.class);
-//                        startActivityForResult(i, REQUEST_ESIGNATURE);
+                        startActivityForResult(i, REQUEST_ENCRYPT);
+                        a.dismiss();
                     }
                 });
+
+//                esignature.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+//                        i.setType("application/pdf");
+//                        i.addCategory(Intent.CATEGORY_OPENABLE);
+//                        startActivityForResult(i, REQUEST_ESIGNATURE);
+////                        Intent i = new Intent(MainActivity.this, EsignatureActivity.class);
+////                        startActivityForResult(i, REQUEST_ESIGNATURE);
+//                    }
+//                });
 
                 pdf_merge_.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -345,6 +401,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         File f4 = new File(Constants.PDF_WATERMARK_PATH);
         File f5 = new File(Constants.PDF_STORAGE_PATH);
         File f6 = new File(Constants.ESIGNATURE_PATH);
+        File f7 = new File(Constants.PDF_ENCRYPTED);
 
         if(!f.exists()) {
             f.mkdirs();
@@ -363,6 +420,9 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         }
         if(!f6.exists()) {
             f6.mkdirs();
+        }
+        if(!f7.exists()) {
+            f7.mkdirs();
         }
     }
 
@@ -433,6 +493,23 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         tableDatatypes.add("varchar(10)");
 
         filesTable.createTable("FileDetails", tableFields, tableDatatypes);
+
+        database = openOrCreateDatabase("FileInformationDB", MODE_PRIVATE, null);
+
+//        String select = "select * from FileDetails";
+//        Cursor c = database.rawQuery(select,null);
+//        if(c.moveToNext()){
+//            Toast.makeText(this, c.getString(8).equals("") ? "empty" : c.getString(8), Toast.LENGTH_SHORT).show();
+//        }
+//        c.close();
+        if(!prefs.getBoolean("googledriveapi", false)) {
+            String alter = "alter table FileDetails add column google_drive_id varchar(1024) default '';";
+            database.execSQL(alter);
+            alter = "alter table FileDetails add column synced varchar(1) default 'N';";
+            database.execSQL(alter);
+            prefs.edit().putBoolean("googledriveapi", true).commit();
+        }
+
 
     }
 
@@ -622,6 +699,88 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //        }
 
         prepareAd();
+        if(requestCode == REQUEST_EXTRACT_TEXT_PDF && resultCode == RESULT_OK) {
+            final Uri uri = data.getData();
+                final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.layout_loading_dialog).setCancelable(false).create();
+                dialog.show();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        try {
+                            PDDocument document = PDDocument.load(getContentResolver().openInputStream(uri));
+                            PDFTextStripper pdfStripper = null;
+                            pdfStripper = new PDFTextStripper();
+                            String text = null;
+                            text = pdfStripper.getText(document);
+                            document.close();
+                            dialog.dismiss();
+                            BottomModalQr textExtractor = new BottomModalQr(text, MainActivity.this, new BottomModalQr.BottomModalQrListener() {
+                                @Override
+                                public void close() {
+
+                                }
+                            });
+                            textExtractor.show(getSupportFragmentManager(), "TEXT_EXTRACTOR");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
+        }
+        if(requestCode == REQUEST_ENCRYPT && resultCode == RESULT_OK) {
+            Uri uri = data.getData();
+            try {
+                final PDDocument d = PDDocument.load(getContentResolver().openInputStream(uri));
+                if(true) {
+                    final BottomModalEncrypt modalEncrypt = new BottomModalEncrypt(MainActivity.this, new BottomModalEncrypt.BottomModalEncryptListener() {
+                        @Override
+                        public void onSave(final String s) {
+                            System.out.println("Save");
+                            final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setCancelable(false).setView(R.layout.layout_loading_dialog).create();
+                                dialog.show();
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    AccessPermission accessPermission = new AccessPermission();
+                                    StandardProtectionPolicy spp = new StandardProtectionPolicy(s,s,accessPermission);
+                                    spp.setEncryptionKeyLength(128);
+                                    spp.setPermissions(accessPermission);
+                                    try {
+                                        d.protect(spp);
+                                        final String name = Constants.PDF_ENCRYPTED + System.currentTimeMillis() + ".pdf";
+                                        d.save(name);
+                                        d.close();
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                dialog.dismiss();
+                                                Toast.makeText(MainActivity.this, "PDF Saved at " + name, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    } catch (Exception e) {
+
+                                        Toast.makeText(MainActivity.this, "ERROR ", Toast.LENGTH_SHORT).show();
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }).start();
+
+                        }
+
+                        @Override
+                        public void close() {
+
+                        }
+                    });
+                    modalEncrypt.show(getSupportFragmentManager(), "encrypt");
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         if (requestCode == 0 && resultCode == RESULT_OK) {
             if (data != null) {
                 if (data.getExtras() != null) {
@@ -664,6 +823,9 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                             insertDirArrayList.add(""); //extension
                             insertDirArrayList.add("'" + creationTime + "'"); //creation
                             insertDirArrayList.add("'" + creationTime + "'"); //modified
+                            insertDirArrayList.add("'" + "'"); //
+                            insertDirArrayList.add("'N" + "'"); //
+
                             filesTable.insertRecord(insertDirArrayList); //save
 
 
@@ -677,6 +839,8 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                             insertImageArrayList.add("'" + "PNG" + "'"); //extension
                             insertImageArrayList.add("'" + creationTime + "'"); //creation
                             insertImageArrayList.add("'" + creationTime + "'"); //modified
+                            insertImageArrayList.add("'" + "'"); //
+                            insertImageArrayList.add("'N" + "'"); //
                             filesTable.insertRecord(insertImageArrayList); //save
 
                             //open next activity
@@ -736,6 +900,8 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                                 a.add("'" + cursor.getString(5) + "'");
                                 a.add("'" + creationTime + "'");
                                 a.add("'" + creationTime + "'");
+                                a.add("'" + "'"); //
+                                a.add("'N" + "'"); //
                                 filesTable.insertRecord(a);
 
                                 if (FileDetailsModel.isAllChildImages(getApplicationContext(), folder)) {
@@ -795,6 +961,8 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 b.add(""); //extension
                 b.add("'" + creationTime + "'"); //creation
                 b.add("'" + creationTime + "'"); //modified
+                b.add("'" + "'"); //
+                b.add("'N" + "'"); //
                 filesTable.insertRecord(b); //save
 
                 try {
@@ -828,6 +996,8 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     a.add("'PNG'");
                     a.add("'" + creationDate + "'");
                     a.add("'" + creationDate + "'");
+                    a.add("'" + "'"); //
+                    a.add("'N" + "'"); //
                     filesTable.insertRecord(a);
                     resetLayoutToDefault();
 
@@ -1092,6 +1262,12 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             resetLayoutToDefault();
         }
 
+//        if(id==R.id.action_sync) {
+//            //sync to google drive
+//            Intent i = new Intent(MainActivity.this, GoogleDriveLogin.class);
+//            startActivity(i);
+//        }
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_create_folder) {
             //create new Folder as root since it is Main Activity
@@ -1121,7 +1297,8 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             values.add(""); //extension
             values.add("'" + creationTime + "'"); //creation date
             values.add("'" + creationTime + "'"); //modified date
-
+            values.add("'" + "'"); //
+            values.add("'N" + "'"); //
             filesTable.insertRecord(values);
             resetLayoutToDefault();
             return true;
@@ -1313,6 +1490,8 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 a.add("'" + cursor.getString(5) + "'");
                 a.add("'" + creationTime + "'");
                 a.add("'" + creationTime + "'");
+                a.add("'" + "'"); //
+                a.add("'N" + "'"); //
                 filesTable.insertRecord(a);
 
 
@@ -1371,6 +1550,8 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     stringArrayList.add("'" + cursor1.getString(5) + "'");
                     stringArrayList.add("'" + creationTime + "'");
                     stringArrayList.add("'" + creationTime + "'");
+                    stringArrayList.add("'" + "'"); //
+                    stringArrayList.add("'N" + "'"); //
                     filesTable.insertRecord(stringArrayList);
                 } catch (Exception e) {
                     e.printStackTrace();

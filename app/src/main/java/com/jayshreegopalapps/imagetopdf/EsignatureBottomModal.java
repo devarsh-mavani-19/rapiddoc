@@ -71,7 +71,7 @@ public class EsignatureBottomModal extends BottomSheetDialogFragment {
                 //write code for saving the signature here
                 Bitmap b = signaturePad.getTransparentSignatureBitmap(true);
                 try {
-                    String p = Constants.ESIGNATURE_PATH + System.currentTimeMillis() + ".png";
+                    String p = Constants.ESIGNATURE_PATH + System.currentTimeMillis() + ".jpg";
                     b.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(p));
                     mListener.save(p);
                     dismiss();

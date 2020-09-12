@@ -29,16 +29,16 @@ vector<Point> getPoints(Mat image)
     // blur will enhance edge detection
     Mat blurred(image_proc);
     medianBlur(image_proc, blurred, 9);
-    
+
     Mat gray0(blurred.size(), CV_8U), gray;
     vector<vector<Point> > contours;
-    
+
     // find squares in every color plane of the image
     for (int c = 0; c < 3; c++)
     {
         int ch[] = {c, 0};
         mixChannels(&blurred, 1, &gray0, 1, ch, 1);
-        
+
         // try several threshold levels
         const int threshold_level = 2;
         for (int l = 0; l < threshold_level; l++)
@@ -48,7 +48,7 @@ vector<Point> getPoints(Mat image)
             if (l == 0)
             {
                 Canny(gray0, gray, 10, 20, 3); //
-                
+
                 // Dilate helps to remove potential holes between edge segments
                 dilate(gray, gray, Mat(), Point(-1,-1));
             }
@@ -56,10 +56,10 @@ vector<Point> getPoints(Mat image)
             {
                 gray = gray0 >= (l+1) * 255 / threshold_level;
             }
-            
+
             // Find contours and store them in a list
             findContours(gray, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-            
+
             // Test contours
             vector<Point> approx;
             for (size_t i = 0; i < contours.size(); i++)
@@ -67,7 +67,7 @@ vector<Point> getPoints(Mat image)
                 // approximate contour with accuracy proportional
                 // to the contour perimeter
                 approxPolyDP(Mat(contours[i]), approx, arcLength(Mat(contours[i]), true)*0.02, true);
-                
+
                 // Note: absolute value of an area is used because
                 // area may be positive or negative - in accordance with the
                 // contour orientation
@@ -76,19 +76,19 @@ vector<Point> getPoints(Mat image)
                     isContourConvex(Mat(approx)))
                 {
                     double maxCosine = 0;
-                    
+
                     for (int j = 2; j < 5; j++)
                     {
                         double cosine = fabs(angle(approx[j%4], approx[j-2], approx[j-1]));
                         maxCosine = MAX(maxCosine, cosine);
                     }
-                    
+
                     if (maxCosine < 0.3)
                         squares.push_back(approx);
                 }
             }
         }
-        
+
         double largest_area = -1;
         int largest_contour_index = 0;
         for(int i=0;i<squares.size();i++)
@@ -100,7 +100,7 @@ vector<Point> getPoints(Mat image)
                 largest_contour_index = i;
             }
         }
-        
+
         __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning size() %d",squares.size());
         vector<Point> points;
         if(squares.size() > 0)
@@ -114,7 +114,7 @@ vector<Point> getPoints(Mat image)
             points.push_back(Point(0, height));
             points.push_back(Point(width, height));
         }
-        
+
         return points;
     }
 }
@@ -127,37 +127,37 @@ Point2f computePoint(int p1, int p2) {
 }
 
 Mat scan(Mat img, jfloat x1, jfloat y1, jfloat x2, jfloat y2, jfloat x3, jfloat y3, jfloat x4, jfloat y4) {
-    
+
     __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Scaning scan() %f",x1);
     // define the destination image size:
-    
+
     float w1 = sqrt( pow(x4 - x3 , 2) + pow(x4 - x3, 2));
     float w2 = sqrt( pow(x2 - x1 , 2) + pow(x2-x1, 2));
     float h1 = sqrt( pow(y2 - y4 , 2) + pow(y2 - y4, 2));
     float h2 = sqrt( pow(y1 - y3 , 2) + pow(y1-y3, 2));
-    
+
     float maxWidth = (w1 < w2) ? w1 : w2;
     float maxHeight = (h1 < h2) ? h1 : h2;
-    
+
     Mat dst = Mat::zeros(maxHeight, maxWidth, CV_8UC3);
-    
+
     // corners of destination image with the sequence [tl, tr, bl, br]
     vector<Point2f> dst_pts, img_pts;
     dst_pts.push_back(Point(0, 0));
     dst_pts.push_back(Point(maxWidth - 1, 0));
     dst_pts.push_back(Point(0, maxHeight - 1));
     dst_pts.push_back(Point(maxWidth - 1, maxHeight - 1));
-    
+
     img_pts.push_back(computePoint(x1,y1));
     img_pts.push_back(computePoint(x2,y2));
     img_pts.push_back(computePoint(x3,y3));
     img_pts.push_back(computePoint(x4,y4));
-    
+
     // get transformation matrix
     Mat transmtx = getPerspectiveTransform(img_pts, dst_pts);
     // apply perspective transformation
     warpPerspective(img, dst, transmtx, dst.size());
-    
+
     return dst;
 }
 
@@ -165,12 +165,12 @@ jobject mat_to_bitmap(JNIEnv * env, Mat & src, bool needPremultiplyAlpha, jobjec
     jclass java_bitmap_class = (jclass)env->FindClass("android/graphics/Bitmap");
     jmethodID mid = env->GetStaticMethodID(java_bitmap_class,
                                            "createBitmap", "(IILandroid/graphics/Bitmap$Config;)Landroid/graphics/Bitmap;");
-    
+
     jobject bitmap = env->CallStaticObjectMethod(java_bitmap_class,
                                                  mid, src.size().width, src.size().height, bitmap_config);
     AndroidBitmapInfo  info;
     void*              pixels = 0;
-    
+
     try {
         CV_Assert(AndroidBitmap_getInfo(env, bitmap, &info) >= 0);
         CV_Assert(src.type() == CV_8UC1 || src.type() == CV_8UC3 || src.type() == CV_8UC4);
@@ -223,31 +223,31 @@ JNIEXPORT jobject JNICALL Java_com_scanlibrary_ScanActivity_getScannedBitmap
     int ret;
     AndroidBitmapInfo info;
     void* pixels = 0;
-    
+
     if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
         __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_getInfo() failed ! error=%d", ret);
         return NULL;
     }
-    
+
     if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888 )
     {       __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"Bitmap format is not RGBA_8888!");
         return NULL;
     }
-    
+
     if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
         __android_log_print(ANDROID_LOG_VERBOSE, APPNAME,"AndroidBitmap_lockPixels() failed ! error=%d", ret);
     }
-    
+
     // init our output image
     Mat mbgra(info.height, info.width, CV_8UC4, pixels);
     Mat dst = scan(mbgra,x1,y1,x2,y2,x3,y3,x4,y4);
-    
+
     //get source bitmap's config
     jclass java_bitmap_class = (jclass)env->FindClass("android/graphics/Bitmap");
     jmethodID mid = env->GetMethodID(java_bitmap_class, "getConfig", "()Landroid/graphics/Bitmap$Config;");
     jobject bitmap_config = env->CallObjectMethod(bitmap, mid);
     jobject _bitmap = mat_to_bitmap(env,dst,false,bitmap_config);
-    
+
     AndroidBitmap_unlockPixels(env, bitmap);
     return _bitmap;
 }

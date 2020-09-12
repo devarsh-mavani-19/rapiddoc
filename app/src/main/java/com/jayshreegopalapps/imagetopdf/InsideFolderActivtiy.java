@@ -610,6 +610,8 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
                         insertImageArrayList.add("'" + "PNG" + "'"); //extension
                         insertImageArrayList.add("'" + creationTime + "'"); //creation
                         insertImageArrayList.add("'" + creationTime + "'"); //modified
+                        insertImageArrayList.add("'" + "'"); //
+                        insertImageArrayList.add("'N" + "'"); //
                         fileTable.insertRecord(insertImageArrayList); //save
 
 
@@ -664,6 +666,8 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
                     a.add("'PNG'");
                     a.add("'" + creationDate + "'");
                     a.add("'" + creationDate + "'");
+                    a.add("'" + "'"); //
+                    a.add("'N" + "'"); //
                     fileTable.insertRecord(a);
                     refreshPage();
                 } catch (IOException e) {
@@ -700,6 +704,8 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
                             a.add("'PNG'");
                             a.add("'" + creationDate + "'");
                             a.add("'" + creationDate + "'");
+                            a.add("'" + "'"); //
+                            a.add("'N" + "'"); //
                             fileTable.insertRecord(a);
                             refreshPage();
 
@@ -737,6 +743,8 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
                         a.add("'PNG'");
                         a.add("'" + creationDate + "'");
                         a.add("'" + creationDate + "'");
+                        a.add("'" + "'"); //
+                        a.add("'N" + "'"); //
                         fileTable.insertRecord(a);
                         refreshPage();
                     } catch (IOException e) {

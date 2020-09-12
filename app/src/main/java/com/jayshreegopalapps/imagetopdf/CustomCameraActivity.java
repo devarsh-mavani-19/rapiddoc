@@ -55,6 +55,7 @@ public class CustomCameraActivity extends AppCompatActivity {
         right = findViewById(R.id.custom_camera_rotate_right);
         frameLayout.addView(showCamera);
         camera.getParameters().setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+
         btn_capture = findViewById(R.id.custom_camera_capture);
         btn_capture.setOnClickListener(new View.OnClickListener() {
             @Override

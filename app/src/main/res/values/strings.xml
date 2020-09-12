@@ -6,4 +6,17 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="admob_app_id">ca-app-pub-4411531601838575~6354155868</string>
+
+
+    <string name="source_google_drive">Google Drive</string>
+    <string name="start_sync">Start Sync</string>
+    <string name="login">Log In</string>
+    <string name="logout">Log Out</string>
+    <string name="status_logged_out">Logged Out</string>
+    <string name="status_logged_in">Logged In</string>
+    <string name="status_user_cancelled">User Cancelled</string>
+    <string name="status_error">We found a problem: %1$s</string>
+    <string name="not_open_file">Could not open file</string>
+
+
 </resources>

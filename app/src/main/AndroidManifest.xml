@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -20,13 +21,31 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".EsignatureActivity"></activity>
+        <activity android:name=".PageNumberActivity"></activity>
+        <activity android:name=".IDCardActivity" />
+        <activity android:name=".OCRActivity" />
+        <activity android:name=".GoogleDriveLogin" />
+        <activity android:name=".EsignatureActivity" />
         <activity android:name=".CustomCameraActivity" />
         <activity android:name=".OpenPDFActivity" />
         <activity android:name=".AddWatermarkActivity" />
         <activity android:name=".ImageInPDFActivity" />
         <activity android:name=".QRCodeScannerActivity" />
         <activity android:name=".OpenImageActivity" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
 
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"
@@ -53,7 +72,8 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
     </application>
 
 </manifest>

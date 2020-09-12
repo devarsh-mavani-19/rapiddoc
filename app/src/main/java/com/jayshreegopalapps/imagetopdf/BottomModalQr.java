@@ -40,7 +40,6 @@ public class BottomModalQr extends BottomSheetDialogFragment {
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("copied qr code", text.getText().toString());
                 clipboard.setPrimaryClip(clip);

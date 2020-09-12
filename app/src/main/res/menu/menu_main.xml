@@ -42,6 +42,12 @@
             android:title="Grid View"
             app:showAsAction="never" />
 
+<!--        <item-->
+<!--            android:id="@+id/action_sync"-->
+<!--            android:icon="@drawable/ic_sync_black_24dp"-->
+<!--            android:title="Sync"-->
+<!--            app:showAsAction="never" />-->
+
 </menu>
     </item>
 </menu>

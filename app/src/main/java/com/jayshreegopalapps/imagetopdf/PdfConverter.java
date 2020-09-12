@@ -172,6 +172,8 @@ public class PdfConverter {
         insertDirArrayList.add(""); //extension
         insertDirArrayList.add("'" + creationTime + "'"); //creation
         insertDirArrayList.add("'" + creationTime + "'"); //modified
+        insertDirArrayList.add("'" + "'"); //
+        insertDirArrayList.add("'N" + "'"); //
         filesTable.insertRecord(insertDirArrayList); //save
 
 
@@ -203,6 +205,8 @@ public class PdfConverter {
                 insertImageArrayList.add("'" + "PNG" + "'"); //extension
                 insertImageArrayList.add("'" + creationTime + "'"); //creation
                 insertImageArrayList.add("'" + creationTime + "'"); //modified
+                insertImageArrayList.add("'" + "'"); //
+                insertImageArrayList.add("'N" + "'"); //
                 filesTable.insertRecord(insertImageArrayList); //save
 
                 page.close();
