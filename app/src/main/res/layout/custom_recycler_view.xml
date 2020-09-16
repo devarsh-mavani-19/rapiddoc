@@ -20,6 +20,7 @@
         <ImageView
             android:id="@+id/image_recycler_customview"
             android:layout_width="wrap_content"
+            android:src="@drawable/addfolder"
             android:scaleType="fitCenter"
             android:layout_marginBottom="-20dp"
             android:forceHasOverlappingRendering="true"

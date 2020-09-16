@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.jayshreegopalapps.imagetopdf">
+    package="com.shortcontent.imagetopdf">
 
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -21,17 +21,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PageNumberActivity"></activity>
-        <activity android:name=".IDCardActivity" />
-        <activity android:name=".OCRActivity" />
-        <activity android:name=".GoogleDriveLogin" />
-        <activity android:name=".EsignatureActivity" />
-        <activity android:name=".CustomCameraActivity" />
-        <activity android:name=".OpenPDFActivity" />
-        <activity android:name=".AddWatermarkActivity" />
-        <activity android:name=".ImageInPDFActivity" />
-        <activity android:name=".QRCodeScannerActivity" />
-        <activity android:name=".OpenImageActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.ImageRotateActivity"></activity>
+        <activity android:name="com.shortcontent.imagetopdf.PageNumberActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.IDCardActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.OCRActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.GoogleDriveLogin" />
+        <activity android:name="com.shortcontent.imagetopdf.EsignatureActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.CustomCameraActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.OpenPDFActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.AddWatermarkActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.ImageInPDFActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.QRCodeScannerActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.OpenImageActivity" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -51,18 +52,18 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="barcode" />
 
-        <activity android:name=".SplitByFixedRangeActivity" />
-        <activity android:name=".PDFToolsActivity" />
-        <activity android:name=".SplitPDFActivity" />
-        <activity android:name=".PDFMergeActivity" />
-        <activity android:name=".ViewPDF" />
-        <activity android:name=".NavigateAllFolders" />
+        <activity android:name="com.shortcontent.imagetopdf.SplitByFixedRangeActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.PDFToolsActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.SplitPDFActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.PDFMergeActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.ViewPDF" />
+        <activity android:name="com.shortcontent.imagetopdf.NavigateAllFolders" />
         <activity
-            android:name=".BottomNavigationActivity"
+            android:name="com.shortcontent.imagetopdf.BottomNavigationActivity"
             android:label="@string/title_activity_bottom_navigation" />
-        <activity android:name=".DatabaseTestActivity" />
-        <activity android:name=".InsideFolderActivtiy" />
-        <activity android:name=".SplashScreen">
+        <activity android:name="com.shortcontent.imagetopdf.DatabaseTestActivity" />
+        <activity android:name="com.shortcontent.imagetopdf.InsideFolderActivtiy" />
+        <activity android:name="com.shortcontent.imagetopdf.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -70,7 +71,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="com.shortcontent.imagetopdf.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />

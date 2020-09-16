@@ -18,6 +18,7 @@
         <ImageView
             android:id="@+id/image_recycler_customview1"
             android:layout_width="wrap_content"
+            android:src="@drawable/addfolder"
             android:scaleType="fitCenter"
             android:forceHasOverlappingRendering="true"
             android:layout_height="80dp"/>

@@ -83,7 +83,7 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/custom_camera_next"
-        android:src="@drawable/ic_done_black_24dp"
+        android:src="@drawable/ic_done_black_24dp2"
         android:layout_alignParentBottom="true"
         android:visibility="invisible"
         android:layout_alignParentEnd="true"

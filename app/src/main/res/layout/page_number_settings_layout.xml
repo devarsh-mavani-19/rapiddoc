@@ -37,16 +37,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <EditText
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/edit_text_starting_page"
-        android:hint="Stating Page Number"
+        android:hint="Starting Page Number"
         android:padding="25dp"
+
         android:inputType="number"
         android:layout_margin="25dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <EditText
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/edit_text_from"
         android:hint="From Page Number"
         android:padding="25dp"
@@ -55,7 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <EditText
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/edit_text_to"
         android:hint="To Page Number"
         android:inputType="number"
@@ -64,7 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edit_text_font_size"
                 android:hint="Text Size"
                 android:inputType="numberDecimal"
@@ -73,9 +74,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <TextView
+                android:text="Text Color"
+                android:textAlignment="center"
+                android:padding="20dp"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/color_picker_indicator"
+                android:layout_gravity="center"
+                android:layout_margin="20dp"
+                android:background="#000"
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+
         <Button
             android:id="@+id/btn_save_settings"
             android:text="Save Settings"
+            android:background="@color/colorPrimary"
+            android:textColor="#fff"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         </LinearLayout>
