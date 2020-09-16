@@ -44,7 +44,7 @@ public class AddWatermarkActivity extends AppCompatActivity {
     Uri mUri;
 
     int red = 0, blue = 0, green = 0;
-    float fontSize = 0;
+    float fontSize = 18.0f;
 
 
     @Override
