@@ -31,6 +31,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.tom_roush.pdfbox.multipdf.PDFMergerUtility;
@@ -63,9 +66,10 @@ public class PDFMergeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdfmerge);
-//        final AdView mAdView = findViewById(R.id.ad_banner_merge);
-//        AdRequest adRequest = new AdRequest.Builder().build();
-//        mAdView.loadAd(adRequest);
+        MobileAds.initialize(this);
+        final AdView mAdView = findViewById(R.id.ad_banner_merge);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
         initViews();
         refreshPage();
 

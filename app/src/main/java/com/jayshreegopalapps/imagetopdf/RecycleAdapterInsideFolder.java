@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Callback;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -297,22 +298,23 @@ class RecycleAdapterInsideFolder extends RecyclerView.Adapter<RecyclerView.ViewH
             textView1.setText(fileDetailsModel.name);
             textView2.setText(fileDetailsModel.creationDate);
             if(FileDetailsModel.isAllChildImages(context, fileDetailsModel.name)) {
-                imageView.setImageURI(Uri.parse(context.getExternalFilesDir(null) + "/" +FileDetailsModel.getDisplayImage(context, fileDetailsModel.name)));
+//                imageView.setImageURI(Uri.parse(context.getExternalFilesDir(null) + "/" +FileDetailsModel.getDisplayImage(context, fileDetailsModel.name)));
 
-//                Picasso.get()
-//                        .load("file://" + context.getExternalFilesDir(null) + "/" +FileDetailsModel.getDisplayImage(context, fileDetailsModel.name))
-//                        .placeholder(R.drawable.addfolder)
-//                        .fit()
-//                        .into(imageView, new Callback() {
-//                            @Override
-//                            public void onSuccess() {
-//
-//                            }
-//                            @Override
-//                            public void onError(Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                        });
+                Picasso.get()
+                        .load("file://" + context.getExternalFilesDir(null) + "/" +FileDetailsModel.getDisplayImage(context, fileDetailsModel.name))
+                        .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                        .placeholder(R.drawable.addfolder)
+                        .fit()
+                        .into(imageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+
+                            }
+                            @Override
+                            public void onError(Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
                 textView3.setText((FileDetailsModel.getImagesCountInsideDir(context, fileDetailsModel.name) + ""));
             }
 

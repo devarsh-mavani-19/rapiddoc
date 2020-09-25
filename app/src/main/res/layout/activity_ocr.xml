@@ -5,11 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".OCRActivity">
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView_banner_ocr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-4411531601838575/7801999673">
+    </com.google.android.gms.ads.AdView>
 
     <ImageView
         android:id="@+id/ocr_image"
-        android:layout_alignParentTop="true"
         android:layout_above="@+id/ll_ocr"
+        android:layout_below="@+id/adView_banner_ocr"
         android:src="@drawable/no_image_selected"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

@@ -6,6 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".PageNumberActivity">
 
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView_banner_page"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-4411531601838575/9691480628">
+    </com.google.android.gms.ads.AdView>
+
     <TextView
         android:id="@+id/text_view_page_number"
         android:padding="20dp"

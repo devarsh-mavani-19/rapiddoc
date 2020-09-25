@@ -6,24 +6,24 @@
     android:layout_height="match_parent"
     tools:context=".InsideFolderActivtiy">
 
-<!--    <com.google.android.gms.ads.AdView-->
-<!--        ads:layout_constraintTop_toTopOf="parent"-->
-<!--        ads:layout_constraintLeft_toLeftOf="parent"-->
-<!--        xmlns:ads="http://schemas.android.com/apk/res-auto"-->
-<!--        android:id="@+id/adView_banner_inside_top"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_centerHorizontal="true"-->
-<!--        android:layout_alignParentBottom="true"-->
-<!--        ads:adSize="BANNER"-->
-<!--        ads:adUnitId="ca-app-pub-4411531601838575/5275866154">-->
-<!--    </com.google.android.gms.ads.AdView>-->
+    <com.google.android.gms.ads.AdView
+        ads:layout_constraintTop_toTopOf="parent"
+        ads:layout_constraintLeft_toLeftOf="parent"
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView_banner_inside_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-4411531601838575/5275866154">
+    </com.google.android.gms.ads.AdView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/images_view_inside_folder"
         android:layout_width="match_parent"
+        app:layout_constraintTop_toBottomOf="@+id/adView_banner_inside_top"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         />
 

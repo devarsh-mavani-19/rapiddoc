@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Callback;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -122,22 +123,23 @@ class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.MyHolder> imple
 
         if(FileDetailsModel.isAllChildImages(context, arrayList.get(position).name)) {
             String imagepath = context.getExternalFilesDir(null) + "/" + FileDetailsModel.getDisplayImage(context, arrayList.get(position).name);
-            holder.imageView.setImageURI(Uri.parse(imagepath));
-//            Picasso.get()
-//                    .load("file://" + imagepath)
-//                    .placeholder(R.drawable.addfolder)
-//                    .fit()
-//                    .into(holder.imageView, new Callback() {
-//                        @Override
-//                        public void onSuccess() {
-//
-//                        }
-//
-//                        @Override
-//                        public void onError(Exception e) {
-//                            e.printStackTrace();
-//                        }
-//                    });
+//            holder.imageView.setImageURI(Uri.parse(imagepath));
+            Picasso.get()
+                    .load("file://" + imagepath)
+                    .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                    .placeholder(R.drawable.addfolder)
+                    .fit()
+                    .into(holder.imageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
         }
         else{
             holder.imageView.setImageResource(R.drawable.addfolder);

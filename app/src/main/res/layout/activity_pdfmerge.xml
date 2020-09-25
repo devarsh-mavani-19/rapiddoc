@@ -6,18 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".PDFMergeActivity">
 
-<!--    <com.google.android.gms.ads.AdView-->
-<!--        ads:layout_constraintTop_toTopOf="parent"-->
-<!--        ads:layout_constraintLeft_toLeftOf="parent"-->
-<!--        xmlns:ads="http://schemas.android.com/apk/res-auto"-->
-<!--        android:id="@+id/ad_banner_merge"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_centerHorizontal="true"-->
-<!--        android:layout_alignParentBottom="true"-->
-<!--        ads:adSize="BANNER"-->
-<!--        ads:adUnitId="ca-app-pub-4411531601838575/7195823612">-->
-<!--    </com.google.android.gms.ads.AdView>-->
+    <com.google.android.gms.ads.AdView
+        ads:layout_constraintTop_toTopOf="parent"
+        ads:layout_constraintLeft_toLeftOf="parent"
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/ad_banner_merge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-4411531601838575/7195823612">
+    </com.google.android.gms.ads.AdView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_merge"

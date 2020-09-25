@@ -14,6 +14,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
@@ -32,6 +35,12 @@ public class OCRActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ocr);
+
+        MobileAds.initialize(this);
+        final AdView mAdView = findViewById(R.id.adView_banner_ocr);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
         btnCamera = findViewById(R.id.btn_capture_image);
         btnGallery = findViewById(R.id.btn_open_gallery);
         btnExtract = findViewById(R.id.btn_extract_text);

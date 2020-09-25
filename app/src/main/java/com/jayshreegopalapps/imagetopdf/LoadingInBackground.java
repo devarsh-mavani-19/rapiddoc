@@ -9,9 +9,11 @@ public class LoadingInBackground extends AsyncTask<Uri,Uri, Uri> {
     private Context context;
     AlertDialog dialog;
     MainActivity m;
-    public LoadingInBackground(Context context, MainActivity m) {
+    PdfToImageCallback mCallback;
+    public LoadingInBackground(Context context, MainActivity m, PdfToImageCallback callback) {
         this.context = context;
         this.m = m;
+        mCallback = callback;
     }
 
     @Override
@@ -36,5 +38,9 @@ public class LoadingInBackground extends AsyncTask<Uri,Uri, Uri> {
     protected void onPostExecute(Uri o) {
         dialog.dismiss();
         m.resetLayoutToDefault();
+        mCallback.conversionDone();
+    }
+    public interface PdfToImageCallback{
+        void conversionDone();
     }
 }

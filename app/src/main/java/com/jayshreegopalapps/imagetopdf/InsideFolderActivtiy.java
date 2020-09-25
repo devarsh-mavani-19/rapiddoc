@@ -35,6 +35,10 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.scanlibrary.ScanActivity;
 import com.scanlibrary.ScanConstants;
@@ -110,7 +114,20 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
         PDFBoxResourceLoader.init(getApplicationContext());
 
 
+        MobileAds.initialize(this);
 
+
+//        prepareAd();
+
+        final AdView mAdView = findViewById(R.id.adView_banner_inside_top);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdFailedToLoad(int i) {
+                super.onAdFailedToLoad(i);
+            }
+        });
 
 
 

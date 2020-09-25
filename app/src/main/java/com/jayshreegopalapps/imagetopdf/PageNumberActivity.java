@@ -22,6 +22,9 @@ import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.github.barteksc.pdfviewer.PDFView;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
@@ -58,6 +61,12 @@ public class PageNumberActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_page_number);
+
+        MobileAds.initialize(this);
+        final AdView mAdView = findViewById(R.id.adView_banner_page);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
         fab_done = findViewById(R.id.page_number_done);
         fab_settings= findViewById(R.id.fab_settings);
         fab_add = findViewById(R.id.page_number_add);

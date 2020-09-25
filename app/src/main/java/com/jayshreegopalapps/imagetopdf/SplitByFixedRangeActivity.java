@@ -22,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.tom_roush.pdfbox.multipdf.Splitter;
@@ -56,9 +58,9 @@ public class SplitByFixedRangeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_split_by_fixed_range);
-//        final AdView mAdView = findViewById(R.id.ad_banner_split_by_range);
-//        AdRequest adRequest = new AdRequest.Builder().build();
-//        mAdView.loadAd(adRequest);
+        final AdView mAdView = findViewById(R.id.ad_banner_split_by_range);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
         initViews();
 
         done.setOnClickListener(new View.OnClickListener() {

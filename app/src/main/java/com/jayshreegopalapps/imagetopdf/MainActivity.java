@@ -14,23 +14,31 @@ import android.os.Build;
 import android.os.Bundle;
 
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-//import com.itextpdf.text.Document;
-//import com.itextpdf.text.Document;
-//import com.itextpdf.text.pdf.PdfCopy;
-//import com.itextpdf.text.pdf.PdfImportedPage;
-//import com.itextpdf.text.pdf.PdfReader;
-//import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
-//import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
 import com.scanlibrary.ScanActivity;
 import com.scanlibrary.ScanConstants;
 import com.squareup.picasso.Picasso;
+import com.tom_roush.pdfbox.cos.COSName;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.pdmodel.PDPage;
+import com.tom_roush.pdfbox.pdmodel.PDPageContentStream;
+import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
+import com.tom_roush.pdfbox.pdmodel.common.PDStream;
 import com.tom_roush.pdfbox.pdmodel.encryption.AccessPermission;
 import com.tom_roush.pdfbox.pdmodel.encryption.PDEncryption;
 import com.tom_roush.pdfbox.pdmodel.encryption.PDEncryptionDictionary;
 import com.tom_roush.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
+import com.tom_roush.pdfbox.pdmodel.graphics.image.JPEGFactory;
+import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import com.tom_roush.pdfbox.rendering.PDFRenderer;
 import com.tom_roush.pdfbox.text.PDFTextStripper;
 import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
 
@@ -83,11 +91,15 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     private int REQUEST_ESIGNATURE = 12;
     private int REQUEST_ENCRYPT = 13;
     private int REQUEST_EXTRACT_TEXT_PDF = 14;
+    private int REQUEST_COMPRESS_PDF = 20;
+    private int REQUEST_OFFICE_TO_PDF = 30;
 
     enum recycler_mode {
-            MODE_GRID,
-            MODE_LIST
-    };
+        MODE_GRID,
+        MODE_LIST
+    }
+
+    ;
     recycler_mode r_mode = recycler_mode.MODE_GRID;
     String parent;
     Toolbar toolbar;
@@ -105,38 +117,35 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     SharedPreferences prefs = null;
     int paddingBottomRecyclerView;
     private boolean isOpen = false;
-//    private InterstitialAd interstitialAd;
+    private InterstitialAd interstitialAd;
     MenuItem renameItem;
     RelativeLayout imageView_empty;
     private Animation fab_clock, fab_anticlock;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         PDFBoxResourceLoader.init(getApplicationContext());
         prefs = getSharedPreferences("com.jayshreegopalapps.ImageToPdf", MODE_PRIVATE);
-//        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-//            @Override
-//            public void onInitializationComplete(InitializationStatus initializationStatus) {
-//            }
-//        });
+        MobileAds.initialize(this);
 
-//        MobileAds.initialize(getApplicationContext());
 
-//        prepareAd();
+        prepareAd();
 
         createDirs();
 
 
-//        final AdView mAdView = findViewById(R.id.adView_banner_main);
-//        AdRequest adRequest = new AdRequest.Builder().build();
-//        mAdView.loadAd(adRequest);
-//        mAdView.setAdListener(new AdListener() {
-//            @Override
-//            public void onAdFailedToLoad(int i) {
-//                super.onAdFailedToLoad(i);
-//            }
-//        });
+        final AdView mAdView = findViewById(R.id.adView_banner_main);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdFailedToLoad(int i) {
+                System.out.println("Ad Not Loaded " + i);
+                super.onAdFailedToLoad(i);
+            }
+        });
 
         //ask permissions
         askPermissions();
@@ -168,8 +177,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             public void onClick(View v) {
 
 
-
-                if(isOpen) {
+                if (isOpen) {
                     //close
                     fab_opener.startAnimation(fab_anticlock);
                     fab.animate().translationY(0);
@@ -179,8 +187,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     fab2.setClickable(false);
                     fab3.setClickable(false);
                     isOpen = false;
-                }
-                else  {
+                } else {
                     //open
 
                     fab_opener.startAnimation(fab_clock);
@@ -202,15 +209,15 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //                startActivityForResult(intent, 0);
                 //launch interstitial ads
 
-                if(!askPermissions()) {
+                if (!askPermissions()) {
                     return;
                 }
 
                 if ((ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.CAMERA) ==
-                        PackageManager.PERMISSION_GRANTED)&& (ContextCompat.checkSelfPermission(
+                        PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                        PackageManager.PERMISSION_GRANTED)&& (ContextCompat.checkSelfPermission(
+                        PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                         PackageManager.PERMISSION_GRANTED)) {
 
@@ -218,11 +225,9 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     startActivityForResult(customCamera, REQUEST_CUSTOM_CAMERA);
 
 
-                }
-                else {
+                } else {
                     askPermissions();
                 }
-
 
 
             }
@@ -240,6 +245,9 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //                Chip esignature = a.findViewById(R.id.esignature);
                 Chip encrypt = a.findViewById(R.id.encrypt);
                 Chip ocr = a.findViewById(R.id.ocr);
+                Chip deletePage = a.findViewById(R.id.deletepdf);
+                Chip rotatePdf = a.findViewById(R.id.rotate_pdf);
+
                 final Chip extractText = a.findViewById(R.id.extract_text_from_pdf);
                 final Chip idcard = a.findViewById(R.id.idcard);
                 final Chip pageno = a.findViewById(R.id.pageno);
@@ -247,6 +255,32 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 //Chip pdf_watermark_  = a.findViewById(R.id.pdf_watermark);
                 final Chip split_by_fixed_range_ = a.findViewById(R.id.split_by_fixed_range);
                 final Chip compress_pdf_ = a.findViewById(R.id.compress_pdf);
+                final Chip officeToPDF = a.findViewById(R.id.office_to_pdf);
+
+                officeToPDF.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent();
+                        i.setAction(Intent.ACTION_GET_CONTENT);
+                        i.setType("application/*");
+                        startActivityForResult(i, REQUEST_OFFICE_TO_PDF);
+                    }
+                });
+                deletePage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        a.dismiss();
+                        Intent i = new Intent(MainActivity.this, DeletePageActivity.class);
+                        startActivity(i);
+                    }
+                });
+                rotatePdf.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(MainActivity.this, RotateActivity.class);
+                        startActivity(i);
+                    }
+                });
 //                Chip image_in_pdf_ = a.findViewById(R.id.image_in_pdf);
 
 //                image_in_pdf_.setOnClickListener(new View.OnClickListener() {
@@ -257,6 +291,18 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //                        startActivity(i);
 //                    }
 //                });
+                Chip compress = a.findViewById(R.id.compress_pdf_actual);
+
+                compress.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent();
+                        i.setAction(Intent.ACTION_GET_CONTENT);
+                        i.setType("application/pdf");
+                        startActivityForResult(i, REQUEST_COMPRESS_PDF);
+                        a.dismiss();
+                    }
+                });
                 pageno.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -325,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     @Override
                     public void onClick(View v) {
                         a.dismiss();
-                        if(!askPermissions()) {
+                        if (!askPermissions()) {
                             return;
                         }
                         pdf_image(v);
@@ -375,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         fab3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!askPermissions()) {
+                if (!askPermissions()) {
                     return;
                 }
                 Intent i = new Intent(getApplicationContext(), QRCodeScannerActivity.class);
@@ -387,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults.length >= 1) {
+        if (grantResults.length >= 1) {
             if (permissions.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 if (grantResults[2] == PackageManager.PERMISSION_GRANTED) {
                     createDirs();
@@ -405,36 +451,49 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         File f5 = new File(Constants.PDF_STORAGE_PATH);
         File f6 = new File(Constants.ESIGNATURE_PATH);
         File f7 = new File(Constants.PDF_ENCRYPTED);
+        File f8 = new File(Constants.PDF_DELETED_PAGES);
+        File f9 = new File(Constants.PDF_ROTATE);
+        File f10 = new File(Constants.OFFICETOPDF);
 
-        if(!f.exists()) {
+        if (!f10.exists()) {
+            f10.mkdirs();
+        }
+        if (!f8.exists()) {
+            f8.mkdirs();
+        }
+
+        if (!f9.exists()) {
+            f9.mkdirs();
+        }
+        if (!f.exists()) {
             f.mkdirs();
         }
-        if(!f2.exists()) {
+        if (!f2.exists()) {
             f2.mkdirs();
         }
-        if(!f3.exists()) {
+        if (!f3.exists()) {
             f3.mkdirs();
         }
-        if(!f4.exists()) {
+        if (!f4.exists()) {
             f4.mkdirs();
         }
-        if(!f5.exists()) {
+        if (!f5.exists()) {
             f5.mkdirs();
         }
-        if(!f6.exists()) {
+        if (!f6.exists()) {
             f6.mkdirs();
         }
-        if(!f7.exists()) {
+        if (!f7.exists()) {
             f7.mkdirs();
         }
     }
 
 
     public void prepareAd() {
-//    interstitialAd = new InterstitialAd(getApplicationContext());
-//    interstitialAd.setAdUnitId("ca-app-pub-4411531601838575/9330661235");
-//    interstitialAd.loadAd(new AdRequest.Builder().build());
-}
+        interstitialAd = new InterstitialAd(getApplicationContext());
+        interstitialAd.setAdUnitId("ca-app-pub-4411531601838575/9330661235");
+        interstitialAd.loadAd(new AdRequest.Builder().build());
+    }
 
     private void initHorizontalBar() {
 //        Chip pdf2Image = findViewById(R.id.pdf_to_image);
@@ -458,12 +517,11 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     }
 
     private void extractBundle() {
-            if(getIntent().getExtras()!=null) {
-                parent = getIntent().getExtras().getString("parentFolder");
-            }
-            else{
-                parent = null;
-            }
+        if (getIntent().getExtras() != null) {
+            parent = getIntent().getExtras().getString("parentFolder");
+        } else {
+            parent = null;
+        }
     }
 
     private void initTable() {
@@ -505,7 +563,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //            Toast.makeText(this, c.getString(8).equals("") ? "empty" : c.getString(8), Toast.LENGTH_SHORT).show();
 //        }
 //        c.close();
-        if(!prefs.getBoolean("googledriveapi", false)) {
+        if (!prefs.getBoolean("googledriveapi", false)) {
             String alter = "alter table FileDetails add column google_drive_id varchar(1024) default '';";
             database.execSQL(alter);
             alter = "alter table FileDetails add column synced varchar(1) default 'N';";
@@ -529,7 +587,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     }
 
     private void initializeBottomMenu() {
-        final ImageView  copyMenu, cutMenu, deleteMenu;
+        final ImageView copyMenu, cutMenu, deleteMenu;
         copyMenu = findViewById(R.id.copy_bottom_nav);
         cutMenu = findViewById(R.id.cut_bottom_nav);
         deleteMenu = findViewById(R.id.delete_bottom_nav);
@@ -537,7 +595,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         copyMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(recycleAdapter.getSelectedItems().size() == 0) {
+                if (recycleAdapter.getSelectedItems().size() == 0) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -557,7 +615,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             @Override
             public void onClick(View v) {
                 HashMap<Integer, String> selectedItems = recycleAdapter.getSelectedItems();
-                if(selectedItems.size() == 0) {
+                if (selectedItems.size() == 0) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -578,7 +636,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             public void onClick(View v) {
 
                 selectedItems = recycleAdapter.getSelectedItems();
-                if(selectedItems.size() == 0) {
+                if (selectedItems.size() == 0) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -590,16 +648,15 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setTitle("Confirm Delete").setMessage("Are You sure you want to delete this? It can't be recovered.").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        for(Integer i : selectedItems.keySet()) {
+                        for (Integer i : selectedItems.keySet()) {
 
                             String query = "select * from FileDetails where parent = '" + selectedItems.get(i) + "'";
                             Cursor cursor = filesTable.customSelect(query);
-                            if(cursor.moveToNext()) {
-                                do{
-                                    if(cursor.getString(3).equals("FILE")) {
+                            if (cursor.moveToNext()) {
+                                do {
+                                    if (cursor.getString(3).equals("FILE")) {
                                         filesTable.customQuery("delete from FileDetails where name = '" + cursor.getString(0) + "'");
-                                    }
-                                    else{
+                                    } else {
                                         recursionDelete(cursor.getString(0));
                                         filesTable.customQuery("delete from FileDetails where name = '" + cursor.getString(0) + "'");
                                     }
@@ -629,39 +686,38 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     private void recursionDelete(String parentFolderName) {
         Cursor cursor = filesTable.customSelect("select * from FileDetails where parent = '" + parentFolderName + "';");
 
-        if(cursor.moveToNext()) {
-            do{
-                if(cursor.getString(3).equals("FILE")) {
+        if (cursor.moveToNext()) {
+            do {
+                if (cursor.getString(3).equals("FILE")) {
 
                     filesTable.customQuery("delete from FileDetails where name = '" + cursor.getString(0) + "'");
-                }
-                else{
+                } else {
                     recursionDelete(cursor.getString(0));
                     filesTable.customQuery("delete from FileDetails where name = '" + parentFolderName + "'");
                 }
-            }while(cursor.moveToNext());
+            } while (cursor.moveToNext());
         }
         cursor.close();
     }
 
     private void deleteSelectedFolders() {
-        filesTable.prepare().where("parent","","").select(new String[]{"*"});
+        filesTable.prepare().where("parent", "", "").select(new String[]{"*"});
         getAllFilesAndFolders("temp");
     }
 
-    private ArrayList<String> getAllFilesAndFolders (String rootPath) {
+    private ArrayList<String> getAllFilesAndFolders(String rootPath) {
         ArrayList<String> listOfFilesAndFolders = new ArrayList<>();
 
         Cursor cursor = filesTable.prepare().where("parent", "=", rootPath).select(new String[]{"name", "type"});
-        if(cursor.moveToNext()) {
-            do{
+        if (cursor.moveToNext()) {
+            do {
                 //store in arraylist
                 listOfFilesAndFolders.add(cursor.getString(0));
-                if(cursor.getString(1).equals("'DIR'")) {
+                if (cursor.getString(1).equals("'DIR'")) {
                     Cursor cursor1 = filesTable.prepare().where("parent", "=", rootPath).select(new String[]{"name", "type"});
                 }
             }
-            while(cursor.moveToNext());
+            while (cursor.moveToNext());
         }
         return listOfFilesAndFolders;
     }
@@ -670,13 +726,13 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         //permission
         if ((ContextCompat.checkSelfPermission(
                 getApplicationContext(), Manifest.permission.CAMERA) !=
-                PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
+                PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(
                 getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) !=
-                PackageManager.PERMISSION_GRANTED)|| (ContextCompat.checkSelfPermission(
+                PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(
                 getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
                 PackageManager.PERMISSION_GRANTED)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},10);
+                requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 10);
             }
             return false;
         }
@@ -685,10 +741,9 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 
     @Override
     public void onBackPressed() {
-        if(isInMultiSelectMode) {
+        if (isInMultiSelectMode) {
             resetLayoutToDefault();
-        }
-        else {
+        } else {
             super.onBackPressed();
         }
     }
@@ -709,57 +764,86 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-//        if(interstitialAd.isLoaded()) {
-//            interstitialAd.show();
-//        }
 
-        prepareAd();
-        if(requestCode == REQUEST_EXTRACT_TEXT_PDF && resultCode == RESULT_OK) {
-            final Uri uri = data.getData();
-                final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.layout_loading_dialog).setCancelable(false).create();
-                dialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+        if(requestCode == REQUEST_OFFICE_TO_PDF && resultCode == RESULT_OK){
+            if(data!=null) {
+                Uri uri = data.getData();
+                OfficeToPDFTask task = new OfficeToPDFTask(MainActivity.this);
+                task.execute(uri);
+            }
+        }
 
-                        try {
-                            PDDocument document = PDDocument.load(getContentResolver().openInputStream(uri));
-                            PDFTextStripper pdfStripper = null;
-                            pdfStripper = new PDFTextStripper();
-                            String text = null;
-                            text = pdfStripper.getText(document);
-                            document.close();
-                            dialog.dismiss();
-                            BottomModalQr textExtractor = new BottomModalQr(text, MainActivity.this, new BottomModalQr.BottomModalQrListener() {
-                                @Override
-                                public void close() {
-
-                                }
-                            });
-                            textExtractor.show(getSupportFragmentManager(), "TEXT_EXTRACTOR");
-                        } catch (Exception e) {
-                            e.printStackTrace();
+        if (requestCode == REQUEST_COMPRESS_PDF && resultCode == RESULT_OK) {
+            if (data != null) {
+                Uri uri = data.getData();
+                System.out.println("Done");
+                try {
+                    PDDocument doc;
+                    doc = PDDocument.load(getContentResolver().openInputStream(uri));
+                    PDStream stream = new PDStream(doc);
+                    doc.save(stream.createOutputStream(COSName.DECODE));
+                    doc.close();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
                         }
+                    });
+                }
+                catch (Exception e ){
+                    e.printStackTrace();
+                }
+
+            }
+        }
+
+
+        if (requestCode == REQUEST_EXTRACT_TEXT_PDF && resultCode == RESULT_OK) {
+            final Uri uri = data.getData();
+            final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.layout_loading_dialog).setCancelable(false).create();
+            dialog.show();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    try {
+                        PDDocument document = PDDocument.load(getContentResolver().openInputStream(uri));
+                        PDFTextStripper pdfStripper = null;
+                        pdfStripper = new PDFTextStripper();
+                        String text = null;
+                        text = pdfStripper.getText(document);
+                        document.close();
+                        dialog.dismiss();
+                        BottomModalQr textExtractor = new BottomModalQr(text, MainActivity.this, new BottomModalQr.BottomModalQrListener() {
+                            @Override
+                            public void close() {
+
+                            }
+                        });
+                        textExtractor.show(getSupportFragmentManager(), "TEXT_EXTRACTOR");
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }).start();
+                }
+            }).start();
 
         }
-        if(requestCode == REQUEST_ENCRYPT && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_ENCRYPT && resultCode == RESULT_OK) {
             Uri uri = data.getData();
             try {
                 final PDDocument d = PDDocument.load(getContentResolver().openInputStream(uri));
-                if(true) {
+                if (true) {
                     final BottomModalEncrypt modalEncrypt = new BottomModalEncrypt(MainActivity.this, new BottomModalEncrypt.BottomModalEncryptListener() {
                         @Override
                         public void onSave(final String s) {
                             System.out.println("Save");
                             final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setCancelable(false).setView(R.layout.layout_loading_dialog).create();
-                                dialog.show();
+                            dialog.show();
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
                                     AccessPermission accessPermission = new AccessPermission();
-                                    StandardProtectionPolicy spp = new StandardProtectionPolicy(s,s,accessPermission);
+                                    StandardProtectionPolicy spp = new StandardProtectionPolicy(s, s, accessPermission);
                                     spp.setEncryptionKeyLength(128);
                                     spp.setPermissions(accessPermission);
                                     try {
@@ -824,11 +908,10 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                             //insert directory as root
                             ArrayList<String> insertDirArrayList = new ArrayList<>();
                             insertDirArrayList.add("'" + directoryName + "'"); //name
-                            if(parent==null){
+                            if (parent == null) {
                                 insertDirArrayList.add("'" + "ROOT" + "'"); //category
                                 insertDirArrayList.add(""); //parent
-                            }
-                            else{
+                            } else {
                                 insertDirArrayList.add("'" + "CHILD" + "'"); //category
                                 insertDirArrayList.add("'" + parent + "'"); //parent
                             }
@@ -890,13 +973,12 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             //store
 
         }
-        if(requestCode == 3) {
+        if (requestCode == 3) {
             if (data != null) {
                 String name = data.getStringExtra("result");
-                if(name.equals("root")) {
+                if (name.equals("root")) {
                     Toast.makeText(getApplicationContext(), "already present at screen", Toast.LENGTH_LONG).show();
-                }
-                else {
+                } else {
                     selectedItems = recycleAdapter.getSelectedItems();
                     for (Integer i : selectedItems.keySet()) {
                         ArrayList<String> a = new ArrayList<>();
@@ -932,8 +1014,8 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 }
             }
         }
-        if(requestCode == 4) {
-            if(data!=null) {
+        if (requestCode == 4) {
+            if (data != null) {
                 String folderName = data.getStringExtra("result");
                 if (folderName.equals("root")) {
                     Toast.makeText(getApplicationContext(), "already present at screen", Toast.LENGTH_LONG).show();
@@ -949,9 +1031,9 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 }
             }
         }
-        if(requestCode == 5) {
+        if (requestCode == 5) {
             //import from gallery
-            if(resultCode == RESULT_OK) {
+            if (resultCode == RESULT_OK) {
 
                 Uri uri = data.getExtras().getParcelable(ScanConstants.SCANNED_RESULT);
                 Bitmap bitmap = null;
@@ -962,11 +1044,10 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 String creationTime = DateTimeUtils.getDate();
 
                 b.add("'" + dirName + "'"); //name
-                if(parent==null){
+                if (parent == null) {
                     b.add("'" + "ROOT" + "'"); //category
                     b.add(""); //parent
-                }
-                else{
+                } else {
                     b.add("'" + "CHILD" + "'"); //category
                     b.add("'" + parent + "'"); //parent
                 }
@@ -1104,10 +1185,10 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             }
         }
 
-        if(requestCode == RESULT_PDF_TO_IMAGE) {
+        if (requestCode == RESULT_PDF_TO_IMAGE) {
 
-            if(data!=null) {
-                if(data.getData()!=null) {
+            if (data != null) {
+                if (data.getData() != null) {
                     Uri uri = data.getData();
                     convertToImages(uri);
 
@@ -1117,8 +1198,8 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         }
 
         if (requestCode == RESULT_PDF_TO_WORD) {
-            if(data!=null) {
-                if(data.getData()!=null) {
+            if (data != null) {
+                if (data.getData() != null) {
 //                    Uri uri = data.getData();
 //                    try {
 //                        PdfReader reader = new PdfReader(getContentResolver().openInputStream(uri));
@@ -1132,23 +1213,23 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 }
             }
         }
-        if(requestCode == REQUEST_CUSTOM_CAMERA && resultCode == RESULT_OK) {
-            if(data!=null) {
+        if (requestCode == REQUEST_CUSTOM_CAMERA && resultCode == RESULT_OK) {
+            if (data != null) {
 
                 String s = data.getStringExtra("location");
 
                 int REQUEST_CODE = 0;
                 int preference = ScanConstants.OPEN_CAMERA;
                 Intent intent = new Intent(MainActivity.this, ScanActivity.class);
-                intent.putExtra("location" , s);
+                intent.putExtra("location", s);
                 intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, preference);
                 startActivityForResult(intent, REQUEST_CODE);
 
             }
         }
-        if(requestCode == RESULT_COMPRESS_PDF) {
-            if(data!=null) {
-                if (data.getData()!=null) {
+        if (requestCode == RESULT_COMPRESS_PDF) {
+            if (data != null) {
+                if (data.getData() != null) {
 //                    PdfReader reader = null;
 //                    try {
 //                        reader = new PdfReader(getContentResolver().openInputStream(data.getData()));
@@ -1169,7 +1250,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 }
             }
         }
-        if(requestCode == REQUEST_ESIGNATURE && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_ESIGNATURE && resultCode == RESULT_OK) {
             Uri uri = data.getData();
             Intent i = new Intent(MainActivity.this, OpenPDFActivity.class);
             System.out.println(uri);
@@ -1179,7 +1260,14 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     }
 
     private void convertToImages(Uri uri) {
-        LoadingInBackground loadingInBackground = new LoadingInBackground(MainActivity.this, this);
+        LoadingInBackground loadingInBackground = new LoadingInBackground(MainActivity.this, this, new LoadingInBackground.PdfToImageCallback() {
+            @Override
+            public void conversionDone() {
+                if (interstitialAd.isLoaded()) {
+                    interstitialAd.show();
+                }
+            }
+        });
         loadingInBackground.execute(uri);
     }
 
@@ -1199,7 +1287,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             prefs.edit().putBoolean("fab_opener", false).commit();
 
 
-            FancyShowCaseView fancyShowCaseView1 =new FancyShowCaseView.Builder(this)
+            FancyShowCaseView fancyShowCaseView1 = new FancyShowCaseView.Builder(this)
                     .focusOn(fab_opener)
                     .title(" \n           " +
                             "\n   " +
@@ -1207,7 +1295,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                             "\n" +
                             "\n" +
                             "\n" +
-                            "\n"+
+                            "\n" +
                             "Show PDF tools")
 
                     .build();
@@ -1222,7 +1310,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     .show();
             File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
             if (!docsFolder.exists()) {
-               docsFolder.mkdir();
+                docsFolder.mkdir();
             }
         }
     }
@@ -1249,18 +1337,17 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 searchView.clearFocus();
                 ArrayList<FileDetailsModel> tempList = new ArrayList<>();
 
-                for(FileDetailsModel r : arrayList){
-                    if(r.name.contains(query)) {
+                for (FileDetailsModel r : arrayList) {
+                    if (r.name.contains(query)) {
                         tempList.add(r);
                     }
                 }
-                if(tempList.isEmpty()) {
+                if (tempList.isEmpty()) {
                     Toast.makeText(MainActivity.this, "Empty List", Toast.LENGTH_SHORT).show();
-                }
-                else{
+                } else {
                     recycleAdapter.updateDataSet(tempList);
                 }
-                
+
                 return false;
 
             }
@@ -1285,7 +1372,11 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if(id == android.R.id.home){
+        if (id == R.id.action_set_password) {
+            openPasswordActivity();
+        }
+
+        if (id == android.R.id.home) {
             resetLayoutToDefault();
         }
 
@@ -1294,6 +1385,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //            Intent i = new Intent(MainActivity.this, GoogleDriveLogin.class);
 //            startActivity(i);
 //        }
+
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_create_folder) {
@@ -1311,11 +1403,10 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 
 
             values.add("'" + folderName + "'"); //name
-            if(parent==null) {
+            if (parent == null) {
                 values.add("'ROOT'"); //category
                 values.add(""); //parent
-            }
-            else{
+            } else {
                 values.add("'CHILD'"); //category
                 values.add("'" + parent + "'"); //parent
             }
@@ -1331,7 +1422,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             return true;
         }
 
-        if(id == R.id.action_import_gallery) {
+        if (id == R.id.action_import_gallery) {
             askPermissions();
             int REQUEST_CODE = 5;
             int preference = ScanConstants.OPEN_MEDIA;
@@ -1346,34 +1437,31 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //            startActivityForResult(Intent.createChooser(intent,"Select Picture"), 5);
         }
 
-        if(id == R.id.action_rename_folder) {
+        if (id == R.id.action_rename_folder) {
             RenameBottomModalSheet renameBottomModalSheet;
-            if(parent == null) {
+            if (parent == null) {
                 HashMap<Integer, String> selected = recycleAdapter.getSelectedItems();
-                if(selected.size() == 1) {
-                    for(Integer i : selected.keySet()) {
+                if (selected.size() == 1) {
+                    for (Integer i : selected.keySet()) {
                         renameBottomModalSheet = new RenameBottomModalSheet(selected.get(i));
                         renameBottomModalSheet.show(getSupportFragmentManager(), "rename");
                         break;
                     }
-                }
-                else {
+                } else {
                     renameBottomModalSheet = new RenameBottomModalSheet("");
                     renameBottomModalSheet.show(getSupportFragmentManager(), "rename");
                 }
-            }
-            else{
+            } else {
                 renameBottomModalSheet = new RenameBottomModalSheet(parent);
                 renameBottomModalSheet.show(getSupportFragmentManager(), "rename");
             }
 
         }
-        if(id == R.id.action_recycler_mode) {
-            if(r_mode == recycler_mode.MODE_GRID) {
+        if (id == R.id.action_recycler_mode) {
+            if (r_mode == recycler_mode.MODE_GRID) {
                 item.setTitle("List View");
                 r_mode = recycler_mode.MODE_LIST;
-            }
-            else{
+            } else {
                 item.setTitle("Grid View");
                 r_mode = recycler_mode.MODE_GRID;
             }
@@ -1383,14 +1471,18 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         return super.onOptionsItemSelected(item);
     }
 
+    private void openPasswordActivity() {
+        Intent i = new Intent(MainActivity.this, SetPasswordActivity.class);
+        startActivity(i);
+    }
+
     void resetLayoutToDefault() {
-        if(parent == null) {
+        if (parent == null) {
             getSupportActionBar().setTitle("ImageToPDF");
-        }
-        else {
+        } else {
             getSupportActionBar().setTitle(parent);
         }
-        if(isInMultiSelectMode) {
+        if (isInMultiSelectMode) {
             check = findViewById(R.id.check_multi_select);
             check.setVisibility(View.INVISIBLE);
             renameItem.setEnabled(false);
@@ -1399,10 +1491,9 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         arrayList.clear();
         fetchRootFolders(parent);
 
-        if(arrayList.isEmpty()) {
+        if (arrayList.isEmpty()) {
             imageView_empty.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             imageView_empty.setVisibility(View.GONE);
         }
 
@@ -1428,11 +1519,9 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             }
         }, false);
         recyclerView.setAdapter(recycleAdapter);
-        recycleAdapter.notifyDataSetChanged();
-        if(r_mode == recycler_mode.MODE_GRID) {
+        if (r_mode == recycler_mode.MODE_GRID) {
             recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 3));
-        }
-        else {
+        } else {
             recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         }
         recyclerView.setPadding(recyclerView.getPaddingLeft(), recyclerView.getPaddingTop(), recyclerView.getPaddingRight(), paddingBottomRecyclerView);
@@ -1449,16 +1538,15 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         //required fields
         //name, modified date, thumbnail, page count
         Cursor cursor;
-        if(parentFolder==null) {
+        if (parentFolder == null) {
             cursor = filesTable.prepare().where("category", "=", "'ROOT'").select(new String[]{"*"});
-        }
-        else{
+        } else {
             cursor = filesTable.prepare().where("parent", "=", "'" + parentFolder + "'").select(new String[]{"*"});
         }
 
 //        Cursor cursor = database.rawQuery(query, null);
-        if(cursor.moveToNext()) {
-            do{
+        if (cursor.moveToNext()) {
+            do {
                 String name = cursor.getString(0);
                 String category = cursor.getString(1);
                 String parent = cursor.getString(2);
@@ -1491,7 +1579,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         cursor.close();
     }
 
-    public void cutItem (String folderName, HashMap<Integer, String> selectedItems) {
+    public void cutItem(String folderName, HashMap<Integer, String> selectedItems) {
 
     }
 
@@ -1500,10 +1588,10 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     }
 
     private void recursionCopy(String folder, String fn) {
-        Cursor cursor = filesTable.prepare().where("parent", "=", "'" + folder + "'").select(new String[] {"*"});
-        if(cursor.moveToNext()) {
+        Cursor cursor = filesTable.prepare().where("parent", "=", "'" + folder + "'").select(new String[]{"*"});
+        if (cursor.moveToNext()) {
 
-            do{
+            do {
                 ArrayList<String> a = new ArrayList<>();
                 String creationTime = DateTimeUtils.getDate();
                 String fnew = DateTimeUtils.getDateTime();
@@ -1522,16 +1610,15 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 filesTable.insertRecord(a);
 
 
-                if(FileDetailsModel.isAllChildImages(getApplicationContext(), cursor.getString(0))) {
+                if (FileDetailsModel.isAllChildImages(getApplicationContext(), cursor.getString(0))) {
                     //duplicate images
                     duplicateImages(cursor.getString(0), fnew);
-                }
-                else{
+                } else {
                     recursionCopy(folder, fn);
                 }
 
             }
-            while(cursor.moveToNext());
+            while (cursor.moveToNext());
         }
     }
 
@@ -1542,13 +1629,12 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 //            cursor1 = filesTable.customSelect("select * from FileDetails where parent = null;");
 //        }
 //        else{
-            cursor1 = filesTable.customSelect("select * from FileDetails where parent = '"+ oldParentFolder +"';");
+        cursor1 = filesTable.customSelect("select * from FileDetails where parent = '" + oldParentFolder + "';");
 //        }
 
 
-        if(cursor1.moveToNext()) {
-            do{
-
+        if (cursor1.moveToNext()) {
+            do {
 
 
                 try {
@@ -1561,9 +1647,9 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     FileOutputStream fos = new FileOutputStream(getExternalFilesDir(null) + "/" + fName + ".png");
 
                     int x;
-                    byte[] buf=new byte[1024];
-                    while ((x = fis.read(buf))!=-1) {
-                        fos.write(buf,0,x);
+                    byte[] buf = new byte[1024];
+                    while ((x = fis.read(buf)) != -1) {
+                        fos.write(buf, 0, x);
                     }
 
                     fos.close();
@@ -1585,9 +1671,8 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 }
 
             }
-            while(cursor1.moveToNext());
-        }
-        else{
+            while (cursor1.moveToNext());
+        } else {
 
         }
 
@@ -1600,25 +1685,22 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
 
     @Override
     public void save(String name, String newName) {
-        if(name.equals("") || newName.equals("")) {
+        if (name.equals("") || newName.equals("")) {
             Toast.makeText(this, "Failed to rename", Toast.LENGTH_SHORT).show();
-        }
-        else{
+        } else {
             Cursor cursor = filesTable.customSelect("select count(*) from FileDetails where name = '" + newName + "'");
-            if(cursor.moveToNext()) {
-                if(cursor.getInt(0) > 0) {
+            if (cursor.moveToNext()) {
+                if (cursor.getInt(0) > 0) {
                     Toast.makeText(this, "Folder already exist", Toast.LENGTH_SHORT).show();
-                }
-                else{
+                } else {
                     filesTable.customQuery("update FileDetails set name = '" + newName + "' where name = '" + name + "'");
                     filesTable.customQuery("update FileDetails set parent = '" + newName + "' where parent = '" + name + "'");
                 }
             }
             cursor.close();
-            if(parent == null) {
+            if (parent == null) {
                 parent = null;
-            }
-            else{
+            } else {
                 parent = newName;
             }
 
@@ -1636,9 +1718,11 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         Intent intent = new Intent(getApplicationContext(), SplitPDFActivity.class);
         startActivity(intent);
     }
+
     public void pdf_watermark(View v) {
         Toast.makeText(this, "Coming Soon", Toast.LENGTH_SHORT).show();
     }
+
     public void pdf_image(View v) {
 //        Intent intent = new Intent(getApplicationContext(), ViewPDF.class);
 //        Bundle bundle = new Bundle();
@@ -1649,27 +1733,27 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         Intent intent = new Intent();
         intent.setType("application/pdf");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Select a PDF"), RESULT_PDF_TO_IMAGE);
+        startActivityForResult(Intent.createChooser(intent, "Select a PDF"), RESULT_PDF_TO_IMAGE);
     }
+
     public void pdf_word(View v) {
         Intent intent = new Intent();
         intent.setType("application/pdf");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Select a PDF"), RESULT_PDF_TO_WORD);
+        startActivityForResult(Intent.createChooser(intent, "Select a PDF"), RESULT_PDF_TO_WORD);
     }
+
     public void word_pdf(View v) {
 
     }
+
     private void split_by_fixed_range() {
         Intent intent = new Intent(getApplicationContext(), SplitByFixedRangeActivity.class);
         startActivity(intent);
     }
 
-    private void compress_pdf() {
-        Intent intent = new Intent();
-        intent.setType("application/pdf");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Select a PDF"), RESULT_COMPRESS_PDF);
+    private void compress_pdf(Uri uri) {
+
     }
 
     private void add_page_numbers() {

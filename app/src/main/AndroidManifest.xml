@@ -21,7 +21,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ImageRotateActivity"></activity>
+        <activity android:name=".QRGenerator"></activity>
+        <activity android:name=".RotateActivity" />
+        <activity android:name=".DeletePageActivity" />
+        <activity android:name=".SetPasswordActivity" />
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-4411531601838575~6354155868" />
+
+        <activity android:name=".ImageRotateActivity" />
         <activity android:name=".PageNumberActivity" />
         <activity android:name=".IDCardActivity" />
         <activity android:name=".OCRActivity" />
