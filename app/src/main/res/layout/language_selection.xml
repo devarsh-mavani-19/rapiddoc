@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/text_language_heading"
+        android:layout_width="wrap_content"
+        android:textColor="@color/colorGray"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/arbutusslabregular"
+        android:layout_centerInParent="true"
+        android:text="Please Select a language to continue"
+        android:layout_height="wrap_content" />
+
+    <RelativeLayout
+        android:id="@+id/relative_english"
+        android:layout_below="@+id/text_language_heading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/language_english"
+            android:layout_centerHorizontal="true"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:src="@drawable/english"
+            />
+
+        <TextView
+            android:text="English"
+            android:textStyle="bold"
+            android:fontFamily="@font/arbutusslabregular"
+            android:layout_below="@+id/language_english"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relative_hindi"
+        android:layout_below="@+id/relative_english"
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/language_hindi"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:src="@drawable/hindi"
+        android:layout_centerHorizontal="true"
+         />
+
+    <TextView
+        android:text="Hindi"
+        android:fontFamily="@font/arbutusslabregular"
+        android:textStyle="bold"
+        android:layout_below="@+id/language_hindi"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_language_select"
+        android:layout_margin="20dp"
+        android:textColor="@color/colorAccent"
+        android:background="@color/colorPrimary"
+        android:layout_below="@+id/relative_hindi"
+        android:layout_centerInParent="true"
+        android:text="@string/save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>

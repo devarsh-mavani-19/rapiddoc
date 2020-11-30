@@ -31,18 +31,15 @@ import java.util.concurrent.Executors;
 public class DriveServiceHelper {
     private final Executor mExecutor = Executors.newSingleThreadExecutor();
     private final Drive mDriveService;
-
+    Context context;
     public DriveServiceHelper(Drive driveService) {
         mDriveService = driveService;
     }
-
-    /**
-     * Creates a text file in the user's My Drive folder and returns its file ID.
-     */
     public Task<String> createFile(final Context context) {
         return Tasks.call(mExecutor, new Callable<String>() {
             @Override
             public String call() throws Exception {
+                DriveServiceHelper.this.context = context;
                 String imagesId;
                 String rapidDocId;
                 String pdfId;
@@ -65,19 +62,44 @@ public class DriveServiceHelper {
 
 
                     File fileMetadata3 = new File();
-                    fileMetadata.setName("PDFs");
-                    fileMetadata.setParents(Collections.singletonList(rapidDocId));
-                    fileMetadata.setMimeType("application/vnd.google-apps.folder");
+                    fileMetadata3.setName("PDFs");
+                    fileMetadata3.setParents(Collections.singletonList(rapidDocId));
+                    fileMetadata3.setMimeType("application/vnd.google-apps.folder");
                     File file3 = mDriveService.files().create(fileMetadata3).execute();
                     preferences.edit().putString("RapidDocPDFsId", file3.getId()).commit();
                     pdfId = file3.getId();
-
                     preferences.edit().putBoolean("FolderCreatedOnDrive", true).commit();
                 }
                 else {
+
                     imagesId = preferences.getString("RapidDocImagesId", "");
                     if(imagesId.equals("")) {
                         return null;
+                    }
+                    rapidDocId = preferences.getString("RapidDocFolderId", "");
+                    if(rapidDocId.equals("")) {
+                        return null;
+                    }
+                    pdfId = preferences.getString("RapidDocPDFsId", "");
+                    if(pdfId.equals("")) {
+                        return null;
+                    }
+                    File rapidDocFolderInstance = mDriveService.files().get(rapidDocId).setFields("trashed").execute();
+                    File imageFoderInstance = mDriveService.files().get(imagesId).setFields("trashed").execute();
+                    File pdfFolderInstace = mDriveService.files().get(pdfId).setFields("trashed").execute();
+                    System.out.println("RAPID DOC " + rapidDocFolderInstance.getId());
+                    if(rapidDocFolderInstance.getTrashed()) {
+
+                        System.out.println("OLD ID = " + rapidDocId);
+                        rapidDocId = createRapidDocFolder();
+                        System.out.println("NEW ID = " + rapidDocId);
+
+                    }
+                    if(imageFoderInstance.getTrashed()) {
+                        imagesId = createImageFolder(rapidDocId);
+                    }
+                    if(pdfFolderInstace.getTrashed()) {
+                        pdfId = createPdfFolder(rapidDocId);
                     }
                 }
 
@@ -90,31 +112,47 @@ public class DriveServiceHelper {
                 java.io.File f;
                 if(cursor.moveToNext()) {
                     do{
-
 //                        File x = mDriveService.files().list()
-
                         f = new java.io.File(context.getExternalFilesDir(null) + "/" + cursor.getString(0));
 
-
-
-                        File metadata = new File()
-                                .setName(cursor.getString(0))
-                                .setParents(Collections.singletonList(imagesId));
-
-                        FileContent mediaContent = new FileContent("image/png", f);
-                        File file = null;
-                        try {
-                            file=  mDriveService.files().create(metadata, mediaContent).execute();
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        String isSynced = cursor.getString(9);
+                        String oldFileId = null;
+                        if(isSynced.equals("Y")) {
+                            oldFileId = cursor.getString(8);
+                        } else {
                         }
-                        if(file ==null) {
-                            throw new IOException("Null result when requesting file");
+                        boolean isFileStoredInDatabase = false;
+                        if(isSynced.equals("Y")) {
+                            File oldFile = mDriveService.files().get(oldFileId).setFields("trashed").execute();
+                            if(oldFile.getTrashed()) {
+                                isFileStoredInDatabase = false;
+                            } else {
+                                isFileStoredInDatabase = true;
+                            }
                         }
-                        String id =file.getId();
-                        String update = "update FileDetails set synced = 'Y' and google_drive_id = '" + id + "' where name='" + cursor.getString(0) + "'";
-                        database.execSQL(update);
+
+
+                        if(!isFileStoredInDatabase) {
+                            File metadata = new File()
+                                    .setName(cursor.getString(0))
+                                    .setParents(Collections.singletonList(imagesId));
+
+                            FileContent mediaContent = new FileContent("image/png", f);
+                            File file = null;
+                            try {
+                                file = mDriveService.files().create(metadata, mediaContent).execute();
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            if(file ==null) {
+                                System.out.println("ERROR");
+                                throw new IOException("Null result when requesting file");
+                            }
+                            String id =file.getId();
+                            String update = "update FileDetails set synced = 'Y', google_drive_id = '" + id + "' where name='" + cursor.getString(0) + "'";
+                            database.execSQL(update);
+                        }
                     } while(cursor.moveToNext()) ;
                     return "";
                 } else{
@@ -129,6 +167,55 @@ public class DriveServiceHelper {
         });
     }
 
+    private String createPdfFolder(String rapidDocId) {
+        try {
+            SharedPreferences preferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
+            File fileMetadata3 = new File();
+            fileMetadata3.setName("PDFs");
+            fileMetadata3.setParents(Collections.singletonList(rapidDocId));
+            fileMetadata3.setMimeType("application/vnd.google-apps.folder");
+            File file3 = mDriveService.files().create(fileMetadata3).execute();
+            preferences.edit().putString("RapidDocPDFsId", file3.getId()).commit();
+            return file3.getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String createImageFolder(String rapidDocId) {
+        try {
+            SharedPreferences preferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            File fileMetadata2 = new File();
+            fileMetadata2.setName("Images");
+            fileMetadata2.setParents(Collections.singletonList(rapidDocId));
+            fileMetadata2.setMimeType("application/vnd.google-apps.folder");
+            File file2 = mDriveService.files().create(fileMetadata2).execute();
+            preferences.edit().putString("RapidDocImagesId", file2.getId()).commit();
+            return file2.getId();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String createRapidDocFolder() {
+        try {
+            SharedPreferences preferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
+            File fileMetadata = new File();
+            fileMetadata.setName("Rapid Doc");
+            fileMetadata.setMimeType("application/vnd.google-apps.folder");
+            File file1 = mDriveService.files().create(fileMetadata).execute();
+            preferences.edit().putString("RapidDocFolderId", file1.getId()).commit();
+            return file1.getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 
     /**

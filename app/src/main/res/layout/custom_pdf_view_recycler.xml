@@ -15,7 +15,7 @@
     <TextView
         android:id="@+id/text_view_pdf_view"
         android:padding="30dp"
-        android:text="Name goes here"
+        android:text="@string/name_goes_here"
         android:textStyle="bold"
         android:textSize="20dp"
         android:fontFamily="serif"

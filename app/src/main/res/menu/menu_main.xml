@@ -13,46 +13,58 @@
     <item
         android:id="@+id/action_set_password"
         android:icon="@drawable/ic_enhanced_encryption_black_24dp"
-        android:title="Encrypt"
+        android:title="@string/encrypt"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_more"
         android:icon="@drawable/ic_more_vert_black_24dp"
-        android:title="Create Folder"
+        android:title="@string/create_folder"
         app:showAsAction="always" ><menu>
 
         <item
             android:id="@+id/action_rename_folder"
             android:icon="@drawable/ic_create_new_folder_black_24dp"
-            android:title="Rename Folder"
+            android:title="@string/rename_folder"
             android:enabled="false"
             app:showAsAction="never" />
 
     <item
         android:id="@+id/action_create_folder"
         android:icon="@drawable/ic_create_new_folder_black_24dp"
-        android:title="Create Folder"
+        android:title="@string/create_folder"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_import_gallery"
         android:icon="@drawable/ic_image_black_24dp"
 
-        android:title="Import From Gallery"
+        android:title="@string/import_from_gallery"
         app:showAsAction="never" />
 
         <item
             android:id="@+id/action_recycler_mode"
             android:icon="@drawable/ic_sort_black_24dp"
-            android:title="Grid View"
+            android:title="@string/gridview"
             app:showAsAction="never" />
 
-<!--        <item-->
-<!--            android:id="@+id/action_sync"-->
-<!--            android:icon="@drawable/ic_sync_black_24dp"-->
-<!--            android:title="Sync"-->
-<!--            app:showAsAction="never" />-->
+        <item
+            android:id="@+id/action_settings"
+            android:icon="@drawable/ic_settings_black_24dp2"
+            android:title="@string/action_settings"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_premium"
+            android:icon="@drawable/ic_attach_money_black_24dp"
+            android:title="@string/premium"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_sync"
+            android:icon="@drawable/ic_sync_black_24dp"
+            android:title="@string/start_sync"
+            app:showAsAction="never" />
 
 </menu>
     </item>

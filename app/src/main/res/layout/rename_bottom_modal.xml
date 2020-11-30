@@ -8,7 +8,7 @@
 
    <com.google.android.material.textfield.TextInputEditText
        android:id="@+id/rename_file_rename_bottom_modal"
-       android:hint="Rename File as ..."
+       android:hint="@string/rename_file_as"
        android:textColorHint="@color/colorPrimaryDark"
 android:textSize="12sp"
        android:fontFamily="@font/arbutusslabregular"
@@ -25,7 +25,7 @@ android:textSize="12sp"
       <Button
           android:id="@+id/save_rename_bottom_modal"
           android:layout_margin="20dp"
-          android:text="Save"
+          android:text="@string/save"
           android:fontFamily="@font/arbutusslabregular"
 android:textSize="12sp"
           android:background="@color/colorAccent"
@@ -35,7 +35,7 @@ android:textSize="12sp"
           android:layout_height="wrap_content"/>
       <Button
           android:id="@+id/cancel_rename_bottom_modal"
-          android:text="Discard"
+          android:text="@string/discard"
           android:textSize="12sp"
           android:background="@color/colorAccent"
           android:textColor="@color/colorPrimary"

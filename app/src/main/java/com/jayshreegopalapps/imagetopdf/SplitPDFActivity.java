@@ -116,7 +116,7 @@ public class SplitPDFActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setType("application/pdf");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent,"Select a PDF"), RESULT_PDF_SPLIT);
+                startActivityForResult(Intent.createChooser(intent,getString(R.string.select_pdf)), RESULT_PDF_SPLIT);
             }
         });
 
@@ -174,6 +174,11 @@ public class SplitPDFActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        LoadSettings.load(SplitPDFActivity.this);
+        LoadSettings.setViewTheme(addPdf, SplitPDFActivity.this);
+        LoadSettings.setViewTheme(done, SplitPDFActivity.this);
+        LoadSettings.setViewTheme(button, SplitPDFActivity.this);
+
         SharedPreferences prefs = getSharedPreferences("com.jayshreegopalapps.ImageToPdf", MODE_PRIVATE);
         if (prefs.getBoolean("split8", true)) {
             // Do first run stuff here then set 'firstrun' as false
@@ -189,7 +194,7 @@ public class SplitPDFActivity extends AppCompatActivity {
                             "\n" +
                             "\n" +
                             "\n" +
-                            "Select a PDF")
+                            getString(R.string.select_pdf))
 
                     .build();
 
@@ -202,7 +207,7 @@ public class SplitPDFActivity extends AppCompatActivity {
                             "\n" +
                             "\n" +
                             "\n" +
-                            "add Custom Range")
+                    getString(R.string.add_custom_range))
                     .build();
 
             FancyShowCaseView fancyShowCaseView2 =new FancyShowCaseView.Builder(this)
@@ -214,7 +219,7 @@ public class SplitPDFActivity extends AppCompatActivity {
                             "\n" +
                             "\n" +
                             "\n" +
-                            "Split PDF")
+                            getString(R.string.split))
                     .build();
 
            /* new FancyShowCaseView.Builder(this)
@@ -246,8 +251,8 @@ public class SplitPDFActivity extends AppCompatActivity {
                         try {
                             reader = PDDocument.load(getContentResolver().openInputStream(pdfUri));
                             maxPageNumber = reader.getNumberOfPages();
-                            textView.setText("PDF selected");
-                            Toast.makeText(this, "PDF selected", Toast.LENGTH_SHORT).show();
+                            textView.setText(getString(R.string.pdf_selected));
+                            Toast.makeText(this, getString(R.string.pdf_selected), Toast.LENGTH_SHORT).show();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -626,7 +631,7 @@ public class SplitPDFActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(context, "PDF Saved in " + foldername, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, getString(R.string.pdf_saved_at) + foldername, Toast.LENGTH_SHORT).show();
                             }
                         });
                     } catch (Exception e) {
@@ -635,18 +640,18 @@ public class SplitPDFActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(context, "Failed To Split", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, getString(R.string.failed_to_split), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
                 } else {
                     View parentLayout = findViewById(android.R.id.content);
-                    Snackbar.make(parentLayout, "Invalid Ranges To proceed", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(parentLayout, getString(R.string.invalid_range), Snackbar.LENGTH_LONG).show();
                 }
             }
             else{
                 View parentLayout = findViewById(android.R.id.content);
-                Snackbar.make(parentLayout, "Please Select a PDF", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(parentLayout, getString(R.string.select_pdf), Snackbar.LENGTH_LONG).show();
             }
         }
 

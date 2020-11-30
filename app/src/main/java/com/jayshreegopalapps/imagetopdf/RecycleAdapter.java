@@ -119,7 +119,7 @@ class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.MyHolder> imple
             }
         });
 
-        holder.textView3.setText((FileDetailsModel.getImagesCountInsideDir(context, arrayList.get(position).name) + " pages"));
+        holder.textView3.setText((FileDetailsModel.getImagesCountInsideDir(context, arrayList.get(position).name) + " " + context.getString(R.string.pages)));
 
         if(FileDetailsModel.isAllChildImages(context, arrayList.get(position).name)) {
             String imagepath = context.getExternalFilesDir(null) + "/" + FileDetailsModel.getDisplayImage(context, arrayList.get(position).name);

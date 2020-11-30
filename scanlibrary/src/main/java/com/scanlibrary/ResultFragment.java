@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -58,6 +60,15 @@ public class ResultFragment extends Fragment {
         setScannedImage(bitmap);
         doneButton = (ImageView) view.findViewById(R.id.doneButton);
         doneButton.setOnClickListener(new DoneButtonClickListener());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        RelativeLayout rel2 = view.findViewById(R.id.rel2);
+        LinearLayout ll = view.findViewById(R.id.topBar);
+        LoadSettings.setViewTheme(rel2, getActivity());
+        LoadSettings.setViewTheme(ll, getActivity());
     }
 
     private Bitmap getBitmap() {

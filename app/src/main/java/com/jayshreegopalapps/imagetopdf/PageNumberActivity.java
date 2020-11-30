@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,6 +57,18 @@ public class PageNumberActivity extends AppCompatActivity {
     private int REQUEST_CODE_PDF = 0;
     PDDocument document;
     private float fontSizeValue = 18.0f;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LoadSettings.load(PageNumberActivity.this);
+        LoadSettings.setViewTheme(textView, PageNumberActivity.this);
+        LoadSettings.setViewTheme(fab_settings, PageNumberActivity.this);
+        LoadSettings.setViewTheme(fab_done, PageNumberActivity.this);
+        LoadSettings.setViewTheme(fab_add, PageNumberActivity.this);
+        LoadSettings.setViewTheme(textView, PageNumberActivity.this);
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,6 +199,7 @@ public class PageNumberActivity extends AppCompatActivity {
                 final AlertDialog dialog = new AlertDialog.Builder(PageNumberActivity.this).setView(R.layout.page_number_settings_layout).create();
                 dialog.show();
                 final Spinner pageMode = dialog.findViewById(R.id.spinner_PageMode);
+                LinearLayout ll_settings = dialog.findViewById(R.id.ll_page_number_settings);
                 final TextInputEditText fontSize = dialog.findViewById(R.id.edit_text_font_size);
                 final TextInputEditText startingPage = dialog.findViewById(R.id.edit_text_starting_page);
                 final TextInputEditText from = dialog.findViewById(R.id.edit_text_from);
@@ -193,11 +207,15 @@ public class PageNumberActivity extends AppCompatActivity {
                 Button btnSave = dialog.findViewById(R.id.btn_save_settings);
                 final Button colorPicker = dialog.findViewById(R.id.color_picker_indicator);
                 ArrayList<String> pageModeList = new ArrayList<>();
-                pageModeList.add("Single Page Mode");
-                pageModeList.add("Facing Page Mode");
+                pageModeList.add(getString(R.string.single_page_mode));
+                pageModeList.add(getString(R.string.facing_page_mode));
+                LoadSettings.setViewTheme(ll_settings, PageNumberActivity.this);
+                LoadSettings.setViewTheme(btnSave, PageNumberActivity.this);
                 ArrayAdapter adapter = new ArrayAdapter(PageNumberActivity.this, android.R.layout.simple_spinner_dropdown_item, pageModeList);
                 pageMode.setAdapter(adapter);
                 colorPicker.setBackgroundColor(Color.rgb(red, green, blue));
+
+
 //                to.setText(String.valueOf(toRange));
 //                from.setText(String.valueOf(fromRange));
 //                startingPage.setText(String.valueOf(firstPageNumber));
@@ -208,7 +226,7 @@ public class PageNumberActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         ColorPickerDialogBuilder
                                 .with(PageNumberActivity.this)
-                                .setTitle("Choose color")
+                                .setTitle(getString(R.string.choose_color))
                                 .showAlphaSlider(false)
                                 .initialColor(Color.argb(255, red, green, blue))
                                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
@@ -219,7 +237,7 @@ public class PageNumberActivity extends AppCompatActivity {
 
                                     }
                                 })
-                                .setPositiveButton("ok", new ColorPickerClickListener() {
+                                .setPositiveButton(getString(R.string.ok), new ColorPickerClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
                                         colorHex = Integer.toHexString(selectedColor);
@@ -231,7 +249,7 @@ public class PageNumberActivity extends AppCompatActivity {
                                         dialog.dismiss();
                                     }
                                 })
-                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
@@ -245,32 +263,32 @@ public class PageNumberActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         if(startingPage.getText().toString().equals("")) {
-                            startingPage.setError("Please Enter Valid Page Number");
+                            startingPage.setError(getString(R.string.please_enter_valid_page_number));
                         }
                         else if(from.getText().toString().equals("")) {
-                            from.setError("Please Enter Valid Starting Range");
+                            from.setError(getString(R.string.please_enter_valid_starting_range));
                         }
                         else if(to.getText().toString().equals("")) {
-                            to.setError("Please Enter Valid Ending Range");
+                            to.setError(getString(R.string.please_enter_valid_ending_range));
                         }
                         else if(fontSize.getText().toString().equals(""))
                         {
-                            fontSize.setError("Select a Font Size");
+                            fontSize.setError(getString(R.string.select_font_size));
                         }
                         else if(Integer.parseInt(from.getText().toString()) > Integer.parseInt(to.getText().toString())) {
-                            Toast.makeText(PageNumberActivity.this, "Invalid Range", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PageNumberActivity.this, getString(R.string.invalid_range), Toast.LENGTH_SHORT).show();
                         }
                         else{
                             firstPageNumber = Integer.parseInt(startingPage.getText().toString());
                             fromRange = Integer.parseInt(from.getText().toString()) - 1;
                             toRange = Integer.parseInt(to.getText().toString()) - 1;
                             fontSizeValue = Float.parseFloat(fontSize.getText().toString());
-                            pageModeType = pageMode.getSelectedItem().toString().equals("Single Page Mode") ? 0 : 1;
+                            pageModeType = pageMode.getSelectedItem().toString().equals(getString(R.string.single_page_mode)) ? 0 : 1;
                             dialog.dismiss();
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(PageNumberActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(PageNumberActivity.this, getString(R.string.done), Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -296,7 +314,7 @@ public class PageNumberActivity extends AppCompatActivity {
                 textView.setText("Preview");
             }
             else{
-                Toast.makeText(this, "Failed To Fetch PDF", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.failed_to_get_pdf), Toast.LENGTH_SHORT).show();
             }
         }
     }

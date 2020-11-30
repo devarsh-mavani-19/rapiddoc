@@ -85,6 +85,7 @@ public class GoogleDriveLogin extends AppCompatActivity {
         GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().requestScopes(new Scope(DriveScopes.DRIVE_FILE)).build();
         GoogleSignInClient client = GoogleSignIn.getClient(GoogleDriveLogin.this, signInOptions);
         startActivityForResult(client.getSignInIntent(), 0);
+
     }
 
     @Override
@@ -119,13 +120,25 @@ public class GoogleDriveLogin extends AppCompatActivity {
                 GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(GoogleDriveLogin.this, Collections.singleton(DriveScopes.DRIVE_FILE));
                 credential.setSelectedAccount(googleSignInAccount.getAccount());
                 Drive googleDriveServices = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).setApplicationName("Image To PDF").build();
-                mDriveServiceHelper = new DriveServiceHelper(googleDriveServices);
 
+                mDriveServiceHelper = new DriveServiceHelper(googleDriveServices);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(GoogleDriveLogin.this, "Successfully Logged In", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(GoogleDriveLogin.this, "Failed To Login", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }

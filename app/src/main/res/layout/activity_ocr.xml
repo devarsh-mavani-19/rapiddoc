@@ -33,7 +33,7 @@
 
         <Button
             android:layout_weight="1"
-            android:text="Camera"
+            android:text="@string/camera"
             android:background="@color/colorPrimary"
             android:textColor="#fff"
             android:id="@+id/btn_capture_image"
@@ -44,14 +44,14 @@
             android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:textColor="#fff"
-            android:text="Gallery"
+            android:text="@string/gallery"
             android:id="@+id/btn_open_gallery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <Button
             android:layout_weight="1"
-            android:text="Extract Text"
+            android:text="@string/extract_text"
             android:background="@color/colorPrimary"
             android:textColor="#fff"
             android:id="@+id/btn_extract_text"

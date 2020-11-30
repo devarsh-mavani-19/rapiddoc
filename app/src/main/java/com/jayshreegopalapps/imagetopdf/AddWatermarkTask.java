@@ -33,7 +33,7 @@ public class AddWatermarkTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        String text = s == null ? "Failed To Add Watermark" : ("PDF Saved at " + s);
+        String text = s == null ? context.getString(R.string.failed_to_add_watermark) : (context.getString(R.string.pdf_saved_at) + " " + s);
         Toast.makeText(context, text, Toast.LENGTH_LONG).show();
         dialog.dismiss();
         if(s!=null) {

@@ -2,18 +2,27 @@ package com.jayshreegopalapps.imagetopdf;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.OnColorSelectedListener;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -21,8 +30,20 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
 import com.scanlibrary.ScanActivity;
 import com.scanlibrary.ScanConstants;
 import com.squareup.picasso.Picasso;
@@ -54,12 +75,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -75,8 +98,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 import me.toptas.fancyshowcase.FancyShowCaseQueue;
 import me.toptas.fancyshowcase.FancyShowCaseView;
@@ -88,18 +113,20 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     private static final int RESULT_COMPRESS_PDF = 9;
     private static final int RESULT_ADD_PAGE = 10;
     private static final int REQUEST_CUSTOM_CAMERA = 11;
+    private static final int REQUEST_CODE_SYNC = 40;
     private int REQUEST_ESIGNATURE = 12;
     private int REQUEST_ENCRYPT = 13;
     private int REQUEST_EXTRACT_TEXT_PDF = 14;
     private int REQUEST_COMPRESS_PDF = 20;
     private int REQUEST_OFFICE_TO_PDF = 30;
 
+    DriveServiceHelper mDriveServiceHelper;
+
     enum recycler_mode {
         MODE_GRID,
         MODE_LIST
     }
 
-    ;
     recycler_mode r_mode = recycler_mode.MODE_GRID;
     String parent;
     Toolbar toolbar;
@@ -239,14 +266,22 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 alertDialog.setView(R.layout.pdftools);
                 final AlertDialog a = alertDialog.create();
                 a.show();
+                LinearLayout pdfToolsTop = a.findViewById(R.id.pdf_tools_top);
+                LoadSettings.setViewTheme(pdfToolsTop, MainActivity.this);
+//                SharedPreferences preferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+//                int r = preferences.getInt("red", 0);
+//                int g = preferences.getInt("green", 39);
+//                int b = preferences.getInt("blue", 38);
+//                pdfToolsTop.setBackgroundColor(Color.rgb(r, g, b));
                 Chip pdf_to_image_ = a.findViewById(R.id.pdf_to_image);
                 Chip pdf_merge_ = a.findViewById(R.id.pdf_merge);
                 Chip pdf_split_ = a.findViewById(R.id.pdf_split);
-//                Chip esignature = a.findViewById(R.id.esignature);
                 Chip encrypt = a.findViewById(R.id.encrypt);
                 Chip ocr = a.findViewById(R.id.ocr);
                 Chip deletePage = a.findViewById(R.id.deletepdf);
                 Chip rotatePdf = a.findViewById(R.id.rotate_pdf);
+
+
 
                 final Chip extractText = a.findViewById(R.id.extract_text_from_pdf);
                 final Chip idcard = a.findViewById(R.id.idcard);
@@ -260,10 +295,33 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 officeToPDF.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent i = new Intent();
-                        i.setAction(Intent.ACTION_GET_CONTENT);
-                        i.setType("application/*");
-                        startActivityForResult(i, REQUEST_OFFICE_TO_PDF);
+                        final SharedPreferences preferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+                        int credits = preferences.getInt("officetopdf", 0);
+                        if(credits ==0) {
+                            final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setMessage("You Do not have enough credits to perform this operation. Do you want to purchase more credits?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent i = new Intent(MainActivity.this, PremiumActivity.class);
+                                    startActivity(i);
+                                }
+                            }).setNegativeButton("no", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).create();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    dialog.show();
+                                }
+                            });
+                        } else {
+                            Intent i = new Intent();
+                            i.setAction(Intent.ACTION_GET_CONTENT);
+                            i.setType("application/*");
+                            startActivityForResult(i, REQUEST_OFFICE_TO_PDF);
+                        }
                     }
                 });
                 deletePage.setOnClickListener(new View.OnClickListener() {
@@ -313,10 +371,10 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                 idcard.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(MainActivity.this, "Comming Soon", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, "Comming Soon", Toast.LENGTH_SHORT).show();
                         //todo uncomment below when implementing
-//                        Intent i = new Intent(MainActivity.this, IDCardActivity.class);
-//                        startActivity(i);
+                        Intent i = new Intent(MainActivity.this, IDCardActivity.class);
+                        startActivity(i);
                     }
                 });
                 extractText.setOnClickListener(new View.OnClickListener() {
@@ -414,7 +472,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         fab2.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(MainActivity.this, "PDF Tools", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, getString(R.string.pdf_tools), Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
@@ -570,8 +628,6 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             database.execSQL(alter);
             prefs.edit().putBoolean("googledriveapi", true).commit();
         }
-
-
     }
 
     private void initViews() {
@@ -584,6 +640,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
         paddingBottomRecyclerView = recyclerView.getPaddingBottom();
         imageView_empty = findViewById(R.id.empty_image);
+        setLocale("");
     }
 
     private void initializeBottomMenu() {
@@ -599,7 +656,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(MainActivity.this, "Please Select a Folder", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, getString(R.string.select_folder), Toast.LENGTH_SHORT).show();
                         }
                     });
                     return;
@@ -619,7 +676,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(MainActivity.this, "Please Select a Folder", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, getString(R.string.select_folder), Toast.LENGTH_SHORT).show();
                         }
                     });
                     return;
@@ -640,12 +697,12 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(MainActivity.this, "Please Select a Folder", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, getString(R.string.select_folder), Toast.LENGTH_SHORT).show();
                         }
                     });
                     return;
                 }
-                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setTitle("Confirm Delete").setMessage("Are You sure you want to delete this? It can't be recovered.").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setTitle(getString(R.string.confirm_delete)).setMessage(getString(R.string.confirm_delete_message)).setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         for (Integer i : selectedItems.keySet()) {
@@ -668,7 +725,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                         }
                         resetLayoutToDefault();
                     }
-                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -765,18 +822,78 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if(requestCode == REQUEST_CODE_SYNC && resultCode == RESULT_OK) {
+            GoogleSignIn.getSignedInAccountFromIntent(data).addOnSuccessListener(new OnSuccessListener<GoogleSignInAccount>() {
+                @Override
+                public void onSuccess(GoogleSignInAccount googleSignInAccount) {
+                    GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(MainActivity.this, Collections.singleton(DriveScopes.DRIVE_FILE));
+                    credential.setSelectedAccount(googleSignInAccount.getAccount());
+                    Drive googleDriveServices = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).setApplicationName("Image To PDF").build();
+                    mDriveServiceHelper = new DriveServiceHelper(googleDriveServices);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, getString(R.string.backing_in_background), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    mDriveServiceHelper.createFile(MainActivity.this).addOnSuccessListener(new OnSuccessListener<String>() {
+                        @Override
+                        public void onSuccess(String s) {
+                            if(s!=null) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this, getString(R.string.sync_success), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this, getString(R.string.failed_to_sync), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MainActivity.this, getString(R.string.failed_to_sync), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            e.printStackTrace();
+                        }
+                    });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, getString(R.string.failed_to_login), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+        }
+
         if(requestCode == REQUEST_OFFICE_TO_PDF && resultCode == RESULT_OK){
             if(data!=null) {
                 Uri uri = data.getData();
                 OfficeToPDFTask task = new OfficeToPDFTask(MainActivity.this);
                 task.execute(uri);
+
             }
         }
 
         if (requestCode == REQUEST_COMPRESS_PDF && resultCode == RESULT_OK) {
             if (data != null) {
                 Uri uri = data.getData();
-                System.out.println("Done");
                 try {
                     PDDocument doc;
                     doc = PDDocument.load(getContentResolver().openInputStream(uri));
@@ -786,7 +903,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, getString(R.string.done), Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -855,12 +972,12 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                                             @Override
                                             public void run() {
                                                 dialog.dismiss();
-                                                Toast.makeText(MainActivity.this, "PDF Saved at " + name, Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(MainActivity.this, getString(R.string.pdf_saved_at) + name, Toast.LENGTH_SHORT).show();
                                             }
                                         });
                                     } catch (Exception e) {
 
-                                        Toast.makeText(MainActivity.this, "ERROR ", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(MainActivity.this, getString(R.string.error), Toast.LENGTH_SHORT).show();
                                         e.printStackTrace();
                                     }
                                 }
@@ -977,7 +1094,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             if (data != null) {
                 String name = data.getStringExtra("result");
                 if (name.equals("root")) {
-                    Toast.makeText(getApplicationContext(), "already present at screen", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.already_exist), Toast.LENGTH_LONG).show();
                 } else {
                     selectedItems = recycleAdapter.getSelectedItems();
                     for (Integer i : selectedItems.keySet()) {
@@ -1018,7 +1135,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
             if (data != null) {
                 String folderName = data.getStringExtra("result");
                 if (folderName.equals("root")) {
-                    Toast.makeText(getApplicationContext(), "already present at screen", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.already_exist), Toast.LENGTH_LONG).show();
                 } else {
                     selectedItems = recycleAdapter.getSelectedItems();
                     for (Integer i : selectedItems.keySet()) {
@@ -1277,10 +1394,61 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         resetLayoutToDefault();
     }
 
+    private void loadSettings() {
+        LoadSettings.load(MainActivity.this);
+        LoadSettings.setViewTheme(fab, MainActivity.this);
+        LoadSettings.setViewTheme(fab2, MainActivity.this);
+        LoadSettings.setViewTheme(fab3, MainActivity.this);
+        LoadSettings.setViewTheme(fab_opener, MainActivity.this);
+        LoadSettings.setViewTheme(bottomNavigationView, MainActivity.this);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        loadSettings();
+
         resetLayoutToDefault();
+        if(prefs.getBoolean("first_time", true)) {
+
+            final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.language_selection).setCancelable(false).create();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    dialog.show();
+                    final RelativeLayout eng = dialog.findViewById(R.id.relative_english);
+                    final RelativeLayout hindi = dialog.findViewById(R.id.relative_hindi);
+                    final String[] language = {""};
+                    eng.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            eng.setBackgroundColor(Color.BLACK);
+                            hindi.setBackgroundColor(Color.WHITE);
+                            language[0] = "en";
+                        }
+                    });
+                    hindi.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            hindi.setBackgroundColor(Color.BLACK);
+                            eng.setBackgroundColor(Color.WHITE);
+                            language[0] = "hi";
+                        }
+                    });
+                    Button btnSave = dialog.findViewById(R.id.btn_language_select);
+                    btnSave.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                            prefs.edit().putString("language", language[0]).commit();
+                            prefs.edit().putBoolean("first_time", false).commit();
+                            setLocale(language[0]);
+                        }
+                    });
+                }
+            });
+        }
+
         if (prefs.getBoolean("fab_opener", true)) {
             // Do first run stuff here then set 'firstrun' as false
             // using the following line to edit/commit prefs
@@ -1315,6 +1483,29 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         }
     }
 
+    public void setLocale(String localeName) {
+//        String currentLanguage = prefs.getString("language", "hi");
+//        if (!localeName.equals(currentLanguage)) {
+//            Locale myLocale = new Locale(localeName);
+//            Resources res = getResources();
+//            DisplayMetrics dm = res.getDisplayMetrics();
+//            Configuration conf = res.getConfiguration();
+//            conf.locale = myLocale;
+//            res.updateConfiguration(conf, dm);
+////            Intent refresh = new Intent(this, MainActivity.class);
+////            refresh.putExtra(currentLanguage, localeName);
+////            startActivity(refresh);
+//        }
+        if(localeName.equals("")) {
+            localeName = prefs.getString("language", "en");
+        }
+        Locale myLocale = new Locale(localeName);//Set Selected Locale
+        Locale.setDefault(myLocale);//set new locale as default
+        Configuration config = new Configuration();//get Configuration
+        config.locale = myLocale;//set config locale as selected locale
+        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -1343,7 +1534,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
                     }
                 }
                 if (tempList.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Empty List", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, getString(R.string.empty_list), Toast.LENGTH_SHORT).show();
                 } else {
                     recycleAdapter.updateDataSet(tempList);
                 }
@@ -1372,19 +1563,33 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if(id == R.id.action_premium) {
+            Intent i = new Intent(MainActivity.this, PremiumActivity.class);
+            startActivity(i);
+        }
+
         if (id == R.id.action_set_password) {
             openPasswordActivity();
+        }
+
+        if (id == R.id.action_settings) {
+            openSettings();
         }
 
         if (id == android.R.id.home) {
             resetLayoutToDefault();
         }
 
-//        if(id==R.id.action_sync) {
-//            //sync to google drive
+        if(id==R.id.action_sync) {
+            //sync to google drive
+            GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().requestScopes(new Scope(DriveScopes.DRIVE_FILE)).build();
+            GoogleSignInClient client = GoogleSignIn.getClient(MainActivity.this, signInOptions);
+            startActivityForResult(client.getSignInIntent(), REQUEST_CODE_SYNC);
+
+
 //            Intent i = new Intent(MainActivity.this, GoogleDriveLogin.class);
 //            startActivity(i);
-//        }
+        }
 
 
         //noinspection SimplifiableIfStatement
@@ -1459,10 +1664,10 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         }
         if (id == R.id.action_recycler_mode) {
             if (r_mode == recycler_mode.MODE_GRID) {
-                item.setTitle("List View");
+                item.setTitle(getString(R.string.listview));
                 r_mode = recycler_mode.MODE_LIST;
             } else {
-                item.setTitle("Grid View");
+                item.setTitle(getString(R.string.gridview));
                 r_mode = recycler_mode.MODE_GRID;
             }
             resetLayoutToDefault();
@@ -1471,12 +1676,139 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         return super.onOptionsItemSelected(item);
     }
 
+    private void openSettings() {
+        final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.activity_settings).setCancelable(false).create();
+        dialog.show();
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                loadSettings();
+                finish();
+                startActivity(getIntent());
+            }
+        });
+
+        ImageView closeButton = dialog.findViewById(R.id.close_settings);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        final SharedPreferences preferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        final String[] lang = new String[1];
+        final Button color;
+        Button logout;
+        LinearLayout header = dialog.findViewById(R.id.ll_heading_settings);
+        final Button language_button = dialog.findViewById(R.id.language_change_button);
+
+        lang[0] = prefs.getString("language", "en");
+        language_button.setText(lang[0]);
+        language_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lang[0] = (lang[0].equals("en")?"hi":"en");
+                language_button.setText(lang[0]);
+                prefs.edit().putString("language", lang[0]).commit();
+            }
+        });
+
+        logout = dialog.findViewById(R.id.button_logout_settings);
+        LoadSettings.setViewTheme(logout, MainActivity.this);
+        LoadSettings.setViewTheme(header, MainActivity.this);
+        LoadSettings.setViewTheme(language_button, MainActivity.this);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().requestScopes(new Scope(DriveScopes.DRIVE_FILE)).build();
+                GoogleSignInClient client = GoogleSignIn.getClient(MainActivity.this, signInOptions);
+
+                client.signOut().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this, getString(R.string.signed_out_successfully), Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this, getString(R.string.failed_to_signout), Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        color = dialog.findViewById(R.id.color_settings);
+        final int[] r = {preferences.getInt("red", 0)};
+        final int[] g = {preferences.getInt("green", 39)};
+        final int[] b = {preferences.getInt("blue", 38)};
+        color.setBackgroundColor(Color.rgb(r[0], g[0], b[0]));
+        color.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ColorPickerDialogBuilder
+                        .with(MainActivity.this)
+                        .showAlphaSlider(false)
+                        .setTitle(getString(R.string.choose_color))
+                        .initialColor(Color.argb(255, r[0], g[0], b[0]))
+                        .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                        .density(12)
+                        .setOnColorSelectedListener(new OnColorSelectedListener() {
+                            @Override
+                            public void onColorSelected(int selectedColor) {
+
+                            }
+                        })
+                        .setPositiveButton("ok", new ColorPickerClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+                                String colorHex = Integer.toHexString(selectedColor);
+                                r[0] = Integer.valueOf( colorHex.substring( 2, 4 ), 16 );
+                                g[0] = Integer.valueOf( colorHex.substring( 4, 6 ), 16 );
+                                b[0] = Integer.valueOf( colorHex.substring( 6, 8 ), 16 );
+                                color.setBackgroundColor(Color.rgb(r[0], g[0], b[0]));
+                                preferences.edit().putInt("red", r[0]).commit();
+                                preferences.edit().putInt("green", g[0]).commit();
+                                preferences.edit().putInt("blue", b[0]).commit();
+
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .build()
+                        .show();
+            }
+        });
+
+
+//        Intent i = new Intent(MainActivity.this, SettingsActivity.class);
+//        startActivity(i);
+    }
+
     private void openPasswordActivity() {
         Intent i = new Intent(MainActivity.this, SetPasswordActivity.class);
         startActivity(i);
     }
 
     void resetLayoutToDefault() {
+
+
         if (parent == null) {
             getSupportActionBar().setTitle("ImageToPDF");
         } else {
@@ -1686,12 +2018,12 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
     @Override
     public void save(String name, String newName) {
         if (name.equals("") || newName.equals("")) {
-            Toast.makeText(this, "Failed to rename", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.failed_to_rename), Toast.LENGTH_SHORT).show();
         } else {
             Cursor cursor = filesTable.customSelect("select count(*) from FileDetails where name = '" + newName + "'");
             if (cursor.moveToNext()) {
                 if (cursor.getInt(0) > 0) {
-                    Toast.makeText(this, "Folder already exist", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.folder_already_exist), Toast.LENGTH_SHORT).show();
                 } else {
                     filesTable.customQuery("update FileDetails set name = '" + newName + "' where name = '" + name + "'");
                     filesTable.customQuery("update FileDetails set parent = '" + newName + "' where parent = '" + name + "'");
@@ -1733,14 +2065,14 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         Intent intent = new Intent();
         intent.setType("application/pdf");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select a PDF"), RESULT_PDF_TO_IMAGE);
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_pdf)), RESULT_PDF_TO_IMAGE);
     }
 
     public void pdf_word(View v) {
         Intent intent = new Intent();
         intent.setType("application/pdf");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select a PDF"), RESULT_PDF_TO_WORD);
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_pdf)), RESULT_PDF_TO_WORD);
     }
 
     public void word_pdf(View v) {
@@ -1760,7 +2092,7 @@ public class MainActivity extends AppCompatActivity implements CustomBottomModal
         Intent intent = new Intent();
         intent.setType("application/pdf");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Select a PDF"), RESULT_ADD_PAGE);
+        startActivityForResult(Intent.createChooser(intent,getString(R.string.select_pdf)), RESULT_ADD_PAGE);
     }
 
 }

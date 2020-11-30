@@ -129,7 +129,7 @@ public class IDCardActivity extends AppCompatActivity {
                 startActivityForResult(intent, 1);
             }
             else {
-                Toast.makeText(this, "Couldn't get Image", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.failed_to_get_image), Toast.LENGTH_SHORT).show();
             }
         }
         if(requestCode == 1 && resultCode == RESULT_OK) {

@@ -43,7 +43,7 @@ public class BottomModalQr extends BottomSheetDialogFragment {
                 ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("copied qr code", text.getText().toString());
                 clipboard.setPrimaryClip(clip);
-                Toast.makeText(context, "copied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.copied), Toast.LENGTH_SHORT).show();
             }
         });
         return v;

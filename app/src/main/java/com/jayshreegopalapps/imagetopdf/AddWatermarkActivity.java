@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,7 +73,10 @@ public class AddWatermarkActivity extends AppCompatActivity {
                 dialog.show();
                 final TextInputEditText font = dialog.findViewById(R.id.font_size_watermark);
                 Button save = dialog.findViewById(R.id.btn_save_settings_watermark);
-
+                LinearLayout ll = dialog.findViewById(R.id.ll_settings_top_watermark);
+                if (ll != null) {
+                    LoadSettings.setViewTheme(ll, AddWatermarkActivity.this);
+                }
                 final Button colorPicker = dialog.findViewById(R.id.color_picker_indicator_watermak);
                 colorPicker.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -80,7 +84,7 @@ public class AddWatermarkActivity extends AppCompatActivity {
                         ColorPickerDialogBuilder
                                 .with(AddWatermarkActivity.this)
                                 .showAlphaSlider(false)
-                                .setTitle("Choose color")
+                                .setTitle(getString(R.string.choose_color))
                                 .initialColor(Color.argb(255, red, green, blue))
                                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                                 .density(12)
@@ -90,7 +94,7 @@ public class AddWatermarkActivity extends AppCompatActivity {
 
                                     }
                                 })
-                                .setPositiveButton("ok", new ColorPickerClickListener() {
+                                .setPositiveButton(getString(R.string.ok), new ColorPickerClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
                                         String colorHex = Integer.toHexString(selectedColor);
@@ -103,7 +107,7 @@ public class AddWatermarkActivity extends AppCompatActivity {
                                         dialog.dismiss();
                                     }
                                 })
-                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
@@ -113,7 +117,9 @@ public class AddWatermarkActivity extends AppCompatActivity {
                                 .show();
                     }
                 });
-
+                if (save != null) {
+                    LoadSettings.setViewTheme(save, AddWatermarkActivity.this);
+                }
                 save.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -131,8 +137,8 @@ public class AddWatermarkActivity extends AppCompatActivity {
         }
 
         if(editText.getText().toString().equals("")){
-            Toast.makeText(this, "Select A PDF", Toast.LENGTH_SHORT).show();
-            editText.setError("Enter Watermark Text");
+            Toast.makeText(this, getString(R.string.select_pdf), Toast.LENGTH_SHORT).show();
+            editText.setError(getString(R.string.enter_watermark_text));
             return;
         }
         AddWatermarkTask task = new AddWatermarkTask(AddWatermarkActivity.this);
@@ -149,6 +155,11 @@ public class AddWatermarkActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        LoadSettings.load(AddWatermarkActivity.this);
+        LoadSettings.setViewTheme(fab_add, AddWatermarkActivity.this);
+        LoadSettings.setViewTheme(fab_save, AddWatermarkActivity.this);
+        LoadSettings.setViewTheme(fab_settings, AddWatermarkActivity.this);
+
         SharedPreferences prefs = getSharedPreferences("com.jayshreegopalapps.ImageToPdf", MODE_PRIVATE);
         if (prefs.getBoolean("watermark", true)) {
             // Do first run stuff here then set 'firstrun' as false
@@ -163,7 +174,7 @@ public class AddWatermarkActivity extends AppCompatActivity {
                             "\n" +
                             "\n" +
                             "\n"+
-                            "Add Pdf")
+                            getString(R.string.add_pdf))
 
                     .build();
 
@@ -171,7 +182,7 @@ public class AddWatermarkActivity extends AppCompatActivity {
 
             FancyShowCaseView fancyShowCaseView2 =new FancyShowCaseView.Builder(this)
                     .focusOn(fab_save)
-                    .title("Save watermarked PDF ")
+                    .title(getString(R.string.save_watermarked_pdf))
                     .build()
                     ;
            /* new FancyShowCaseView.Builder(this)
@@ -218,7 +229,7 @@ public class AddWatermarkActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setType("application/pdf");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Select a PDF"), REQUEST_GET_PDF);
+        startActivityForResult(Intent.createChooser(intent,getString(R.string.select_pdf)), REQUEST_GET_PDF);
     }
 
     private boolean isPermissionGranted() {

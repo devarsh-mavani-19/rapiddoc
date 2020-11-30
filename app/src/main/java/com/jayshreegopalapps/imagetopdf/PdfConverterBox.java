@@ -21,6 +21,7 @@ import com.tom_roush.pdfbox.pdmodel.graphics.PDXObject;
 import com.tom_roush.pdfbox.pdmodel.graphics.color.PDColor;
 import com.tom_roush.pdfbox.pdmodel.graphics.color.PDColorSpace;
 import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import com.tom_roush.pdfbox.util.Matrix;
 
 import java.io.File;
 import java.io.IOException;

@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
+
 /**
  * Created by jhansi on 28/03/15.
  */
@@ -17,6 +18,7 @@ public class ScanActivity extends Activity implements IScanner, ComponentCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan_layout);
+        LoadSettings.load(ScanActivity.this);
         if(getIntent().getIntExtra(ScanConstants.OPEN_INTENT_PREFERENCE, -1) == (ScanConstants.OPEN_MEDIA)) {
             init();
         }
@@ -24,6 +26,12 @@ public class ScanActivity extends Activity implements IScanner, ComponentCallbac
             String u = getIntent().getStringExtra("location");
             init3(u);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     private void init() {

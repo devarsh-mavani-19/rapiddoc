@@ -74,7 +74,7 @@ public class SplitByFixedRangeActivity extends AppCompatActivity {
                     task.execute();
                 }
                 else{
-                    Toast.makeText(SplitByFixedRangeActivity.this, "Please Choose a pdf", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SplitByFixedRangeActivity.this, getString(R.string.select_pdf), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -161,6 +161,10 @@ public class SplitByFixedRangeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        LoadSettings.load(SplitByFixedRangeActivity.this);
+        LoadSettings.setViewTheme(done, SplitByFixedRangeActivity.this);
+        LoadSettings.setViewTheme(selectPdf, SplitByFixedRangeActivity.this);
+
         SharedPreferences prefs = getSharedPreferences("com.jayshreegopalapps.ImageToPdf", MODE_PRIVATE);
         if (prefs.getBoolean("splitfixed8", true)) {
             // Do first run stuff here then set 'firstrun' as false

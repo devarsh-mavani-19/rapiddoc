@@ -38,7 +38,7 @@
         >
 
         <TextView
-            android:text="From : "
+            android:text="@string/from"
             android:layout_weight="1"
             android:fontFamily="@font/arbutusslabregular"
             android:layout_width="match_parent"
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content" />
 
         <TextView
-            android:text="To : "
+            android:text="@string/to"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:fontFamily="@font/arbutusslabregular"

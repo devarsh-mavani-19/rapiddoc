@@ -43,12 +43,12 @@
             android:layout_below="@+id/image_recycler_customview"
             android:layout_gravity="center"
             android:textStyle="bold"
-            android:text="FolderName"
+            android:text="@string/foldername"
             android:fontFamily="@font/arbutusslabregular"
             android:gravity="center"
             android:padding="2dp"
             android:textSize="9dp"
-            android:textColor="@color/colorPrimary"></TextView>
+            android:textColor="@color/colorPrimary" />
 
         <TextView
             android:id="@+id/txt_recycler_customview_date"
@@ -56,14 +56,14 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/image_recycler_customview"
             android:layout_gravity="center"
-            android:text="date    time"
+            android:text="@string/date_time"
             android:fontFamily="@font/arbutusslabregular"
             android:textSize="8dp"
             android:gravity="start"
             android:padding="2dp"
             android:layout_weight="1"
 
-            android:textColor="@color/colorPrimary"></TextView>
+            android:textColor="@color/colorPrimary" />
 
         <TextView
             android:id="@+id/txt_recycler_customview_no_of_pages"
@@ -71,12 +71,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/image_recycler_customview"
             android:layout_gravity="center"
-            android:text="10 Pages"
             android:textSize="8dp"
             android:fontFamily="@font/arbutusslabregular"
             android:gravity="start"
             android:layout_weight="1"
             android:padding="2dp"
-            android:textColor="@color/colorPrimary"></TextView>
+            android:textColor="@color/colorPrimary" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

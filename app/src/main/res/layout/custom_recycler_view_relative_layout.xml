@@ -45,7 +45,7 @@
             android:gravity="center"
             android:padding="2dp"
             android:textSize="12dp"
-            android:textColor="@color/colorBlack"></TextView>
+            android:textColor="@color/colorBlack" />
 
         <TextView
             android:id="@+id/txt_recycler_customview_date1"
@@ -53,28 +53,27 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/image_recycler_customview"
             android:layout_gravity="center"
-            android:text="date    time"
+            android:text="date time"
             android:fontFamily="sans-serif"
             android:textSize="8dp"
             android:gravity="start"
             android:padding="2dp"
             android:layout_weight="1"
 
-            android:textColor="@color/colorBlack"></TextView>
+            android:textColor="@color/colorBlack" />
 
         <TextView
             android:id="@+id/txt_recycler_customview_no_of_pages1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/image_recycler_customview"
             android:layout_gravity="center"
             android:text="10 Pages"
-            android:textSize="8dp"
+            android:textSize="8sp"
 
             android:fontFamily="sans-serif"
             android:gravity="start"
             android:layout_weight="1"
             android:padding="2dp"
-            android:textColor="@color/colorBlack"></TextView>
+            android:textColor="@color/colorBlack" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

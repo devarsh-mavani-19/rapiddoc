@@ -19,6 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="28dp"
         android:layout_marginBottom="28dp"
+        android:backgroundTint="@color/colorPrimary"
         android:src="@drawable/ic_done_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />

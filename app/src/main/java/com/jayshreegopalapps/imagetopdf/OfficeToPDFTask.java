@@ -2,6 +2,7 @@ package com.jayshreegopalapps.imagetopdf;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -55,6 +56,12 @@ public class OfficeToPDFTask extends AsyncTask<Uri, Void, String> {
             String startUrl = "https://api.ilovepdf.com/v1/start/officepdf";
             Request request1 = new Request.Builder().url(startUrl).header("Cache-Control", "no-cache").header("Authorization", "Bearer " + tokenString).build();
             client.newCall(request1).execute();
+            SharedPreferences preferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            int credit = preferences.getInt("officetopdf",0);
+            if(credit == 0) {
+                return null;
+            }
+            preferences.edit().putInt("officetopdf", credit-1).commit();
             Response startResponse = client.newCall(request1).execute();
             JSONObject startJSON =new JSONObject(startResponse.body().string());
             String task = startJSON.getString("task");
@@ -123,9 +130,9 @@ public class OfficeToPDFTask extends AsyncTask<Uri, Void, String> {
         super.onPostExecute(aVoid);
         dialog.dismiss();
         if(aVoid==null) {
-            Toast.makeText(context, "Failed to convert File to pdf", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.failed_convert_pdf), Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(context, "File Saved at " + aVoid, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.file_saved_at) + aVoid, Toast.LENGTH_SHORT).show();
         }
     }
 }

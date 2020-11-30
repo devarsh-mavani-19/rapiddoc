@@ -30,7 +30,7 @@
         android:id="@+id/fixed_range_split"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Ex: Split at every 2 pages"
+        android:hint="@string/ex_split_at_every_2_pages"
         android:layout_margin="20dp"
         android:inputType="number"
         android:fontFamily="@font/arbutusslabregular"
@@ -49,7 +49,7 @@
         android:layout_height="wrap_content">
     <Button
         android:id="@+id/button_fixed_range_done"
-        android:text="Split"
+        android:text="@string/split"
         android:fontFamily="@font/arbutusslabregular"
         android:textStyle="bold"
 
@@ -63,7 +63,7 @@
         />
         <Button
             android:id="@+id/button_fixed_range_select_pdf"
-            android:text="Select PDF"
+            android:text="@string/select_pdf"
             android:background="@color/colorAccent"
             android:layout_width="match_parent"
             android:fontFamily="@font/arbutusslabregular"

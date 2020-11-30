@@ -28,7 +28,7 @@ public class ImageInPDFActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.setType("image/*");
-                startActivityForResult(Intent.createChooser(i, "Select image"), 0);
+                startActivityForResult(Intent.createChooser(i, getString(R.string.select_image)), 0);
             }
         });
     }

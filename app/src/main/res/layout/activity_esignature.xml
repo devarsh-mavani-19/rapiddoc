@@ -41,13 +41,13 @@
                 android:id="@+id/DoneButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Done" />
+                android:text="@string/done" />
 
             <Button
                 android:id="@+id/ClearButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Clear" />
+                android:text="@string/clear" />
         </LinearLayout>
     </RelativeLayout>
 

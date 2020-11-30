@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +56,13 @@ public class ScanFragment extends Fragment {
         view = inflater.inflate(R.layout.scan_fragment_layout, null);
         init();
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        RelativeLayout rel = view.findViewById(R.id.rel);
+        LoadSettings.setViewTheme(rel, getActivity());
     }
 
     public ScanFragment() {

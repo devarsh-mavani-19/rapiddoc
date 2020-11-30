@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PremiumActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/text_view_premium"
+        android:padding="20dp"
+        android:gravity="center"
+        android:text="Updating Data"
+        android:textStyle="bold"
+        android:fontFamily="@font/arbutusslabregular"
+        android:textSize="18sp"
+        android:layout_margin="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+
+    <ImageView
+        android:padding="20dp"
+        android:layout_below="@+id/text_view_premium"
+        android:src="@drawable/office_to_pdf_purchase"
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btn_buy"
+        android:layout_margin="50dp"
+        android:text="@string/buy"
+        android:background="@color/colorPrimary"
+        android:fontFamily="@font/arbutusslabregular"
+        android:textSize="18sp"
+        android:textColor="@color/colorAccent"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
@@ -64,6 +65,8 @@ public class PickImageFragment extends Fragment {
             getActivity().finish();
         }
     }
+
+
 
     private void clearTempImages() {
         try {
@@ -143,6 +146,8 @@ public class PickImageFragment extends Fragment {
     public void onResume() {
         super.onResume();
         System.out.println("Resume");
+        RelativeLayout rl = view.findViewById(R.id.rl_pick_image_fragment);
+        LoadSettings.setViewTheme(rl, getActivity());
     }
 
     @Override

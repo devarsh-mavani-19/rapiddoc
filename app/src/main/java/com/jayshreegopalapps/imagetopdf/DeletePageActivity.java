@@ -30,6 +30,15 @@ public class DeletePageActivity extends AppCompatActivity {
     private int REQUEST_CODE_PDF = 0;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        LoadSettings.load(DeletePageActivity.this);
+        LoadSettings.setViewTheme(fab, DeletePageActivity.this);
+        LoadSettings.setViewTheme(fab_save, DeletePageActivity.this);
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_delete_page);
@@ -59,10 +68,10 @@ public class DeletePageActivity extends AppCompatActivity {
 
                     String fileName = System.currentTimeMillis() + ".pdf";
                     document.save(Constants.PDF_DELETED_PAGES + fileName);
-                    Toast.makeText(DeletePageActivity.this, "PDF Saved at " + Constants.PDF_DELETED_PAGES + fileName, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DeletePageActivity.this, getString(R.string.pdf_saved_at) + Constants.PDF_DELETED_PAGES + fileName, Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(DeletePageActivity.this, "Failed To Remove Pages", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DeletePageActivity.this, getString(R.string.failed_to_remove_pages), Toast.LENGTH_SHORT).show();
                 }
             }
         });

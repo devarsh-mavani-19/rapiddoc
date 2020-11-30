@@ -64,12 +64,21 @@ public class OpenImageActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LoadSettings.load(OpenImageActivity.this);
+        LoadSettings.setViewTheme(save, OpenImageActivity.this);
+        LoadSettings.setViewTheme(discard, OpenImageActivity.this);
+
+    }
+
     private void saveImage() {
         if(fileName!=null) {
             try {
                 FileOutputStream fos = new FileOutputStream(getExternalFilesDir(null) + "/" + fileName);
                 bMap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.done), Toast.LENGTH_SHORT).show();
                 Picasso.get().invalidate(getExternalFilesDir(null) + "/" + fileName);
                 finish();
             } catch (FileNotFoundException e) {

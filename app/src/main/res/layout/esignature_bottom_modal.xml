@@ -18,14 +18,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/saveButton"
-            android:text="Save"
+            android:text="@string/save"
             android:layout_weight="1"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/clearButton"
-            android:text="Clear"
+            android:text="@string/clear"
             android:layout_weight="1"/>
     </LinearLayout>
 

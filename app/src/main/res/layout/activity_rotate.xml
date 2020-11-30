@@ -53,7 +53,7 @@
         android:id="@+id/fab_done_pdf_rotate"
         android:layout_alignParentEnd="true"
         android:layout_above="@+id/fab_add_pdf_rotate"
-        android:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="@color/colorPrimary"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
         android:src="@drawable/ic_done_black_24dp"
@@ -67,7 +67,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
         android:src="@drawable/ic_add_black_24dp"
-        android:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="@color/colorPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

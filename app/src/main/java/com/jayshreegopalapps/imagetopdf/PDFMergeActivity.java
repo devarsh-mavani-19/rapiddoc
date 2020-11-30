@@ -83,7 +83,7 @@ public class PDFMergeActivity extends AppCompatActivity {
                 intent.setType("application/pdf");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                startActivityForResult(Intent.createChooser(intent,"Select a PDF"), ADD_PDF_MERGE);
+                startActivityForResult(Intent.createChooser(intent,getString(R.string.select_pdf)), ADD_PDF_MERGE);
             }
         });
 
@@ -150,6 +150,11 @@ public class PDFMergeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        LoadSettings.load(PDFMergeActivity.this);
+        LoadSettings.setViewTheme(fab, PDFMergeActivity.this);
+        LoadSettings.setViewTheme(fab2, PDFMergeActivity.this);
+
+
         prefs = getSharedPreferences("com.jayshreegopalapps.ImageToPdf", MODE_PRIVATE);
 
         if (prefs.getBoolean("merge8", true)) {
@@ -166,7 +171,7 @@ public class PDFMergeActivity extends AppCompatActivity {
                             "\n" +
                             "\n" +
                             "\n" +
-                            "Add Pdf to merge list")
+                            getString(R.string.add_pdf_to_merge_list))
 
                     .build();
 
@@ -179,7 +184,7 @@ public class PDFMergeActivity extends AppCompatActivity {
                             "\n" +
                             "\n" +
                             "\n" +
-                            "Merge PDF from here")
+                            getString(R.string.merge_pdf_from_here))
                     .build();
 
            /* new FancyShowCaseView.Builder(this)
@@ -226,7 +231,7 @@ public class PDFMergeActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(PDFMergeActivity.this, "Failed to merge pdf.. Maybe one of the pdf is corrupted", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(PDFMergeActivity.this, getString(R.string.corrupted_pdf), Toast.LENGTH_SHORT).show();
                                 }
                             });
                             return;
@@ -242,14 +247,14 @@ public class PDFMergeActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                         View parentLayout = findViewById(android.R.id.content);
-                        Snackbar.make(parentLayout, "Failed to save PDF", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(parentLayout, getString(R.string.failed_to_save), Snackbar.LENGTH_LONG).show();
 
                     }
 
                 }
                 else{
                     View parentLayout = findViewById(android.R.id.content);
-                    Snackbar.make(parentLayout, "Please Select at least 1 PDF " , Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(parentLayout, getString(R.string.please_select_atleast_one_pdf) , Snackbar.LENGTH_LONG).show();
                 }
                 runOnUiThread(new Runnable() {
                     @Override

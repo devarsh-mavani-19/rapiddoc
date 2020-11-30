@@ -30,6 +30,15 @@ public class RotateActivity extends AppCompatActivity {
     ImageView rotateLeft, rotateRight;
     TextView seekbarprogress;
     int degrees = 0;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LoadSettings.load(RotateActivity.this);
+        LoadSettings.setViewTheme(fab_add, RotateActivity.this);
+        LoadSettings.setViewTheme(fab_done, RotateActivity.this);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,7 +110,7 @@ public class RotateActivity extends AppCompatActivity {
                                         Intent i = new Intent(RotateActivity.this, OpenPDFActivity.class);
                                         i.setDataAndType(Uri.parse("file:///" + Constants.PDF_ROTATE + fileName), "application/pdf");
                                         startActivity(i);
-                                        Toast.makeText(RotateActivity.this, "PDF Saved in " + Constants.PDF_ROTATE + fileName, Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(RotateActivity.this, getString(R.string.pdf_saved_at) + Constants.PDF_ROTATE + fileName, Toast.LENGTH_SHORT).show();
                                         dialog.dismiss();
                                     }
                                 });

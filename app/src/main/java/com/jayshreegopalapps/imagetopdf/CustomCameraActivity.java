@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -39,6 +40,15 @@ public class CustomCameraActivity extends AppCompatActivity {
     FloatingActionButton back, next, left, right;
     ImageView btn_capture, imageView,flash;
     private boolean isFlashOn = false;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        RelativeLayout relativeLayout = findViewById(R.id.custom_camera_top);
+        LoadSettings.setViewTheme(relativeLayout, CustomCameraActivity.this);
+        LoadSettings.load(CustomCameraActivity.this);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,16 +108,41 @@ public class CustomCameraActivity extends AppCompatActivity {
             left.show();
             right.show();
             try {
+                final AlertDialog d = new AlertDialog.Builder(CustomCameraActivity.this).setView(R.layout.layout_loading_dialog).create();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        d.show();
+                    }
+                });
+                final Bitmap[][] b = new Bitmap[1][1];
+                final Bitmap[][] n = new Bitmap[1][1];
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            b[0] = new Bitmap[]{BitmapFactory.decodeByteArray(data, 0, data.length)};
+                            n[0] = new Bitmap[]{Bitmap.createScaledBitmap(b[0][0], (int) (b[0][0].getWidth() * 0.6), (int) (b[0][0].getHeight() * 0.3), false)};
+                            File f = new File(ScanConstants.IMAGE_PATH);
+                            if (!f.exists()) {
+                                f.mkdir();
+                            }
+                            n[0][0].compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(ScanConstants.IMAGE_PATH + "/m_image.png"));
+                            imageView.setImageBitmap(n[0][0]);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    d.dismiss();
+                                }
+                            });
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
 
-                final Bitmap[] b = {BitmapFactory.decodeByteArray(data, 0, data.length)};
-                final Bitmap[] n = {Bitmap.createScaledBitmap(b[0], (int) (b[0].getWidth() * 0.6), (int) (b[0].getHeight() * 0.6),false)};
 
-                File f = new File(ScanConstants.IMAGE_PATH);
-                if(!f.exists()) {
-                    f.mkdir();
-                }
-                n[0].compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(ScanConstants.IMAGE_PATH + "/m_image.png"));
-                imageView.setImageBitmap(n[0]);
                 back.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -136,7 +171,7 @@ public class CustomCameraActivity extends AppCompatActivity {
                                 public void run() {
                                     try {
                                         FileOutputStream fos = new FileOutputStream(ScanConstants.IMAGE_PATH + "/" + "m_image.png");
-                                        n[0].compress(Bitmap.CompressFormat.PNG, 100, fos);
+                                        b[0][0].compress(Bitmap.CompressFormat.PNG, 100, fos);
                                         fos.close();
                                         runOnUiThread(new Runnable() {
                                             @Override
@@ -165,8 +200,13 @@ public class CustomCameraActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         Matrix mat = new Matrix();
                          mat.postRotate(-90.0f);
-                       n[0] = Bitmap.createBitmap(n[0], 0, 0, n[0].getWidth(), n[0].getHeight(), mat, true);
-                        imageView.setImageBitmap(n[0]);
+                       n[0][0] = Bitmap.createBitmap(n[0][0], 0, 0, n[0][0].getWidth(), n[0][0].getHeight(), mat, true);
+                       runOnUiThread(new Runnable() {
+                           @Override
+                           public void run() {
+                               imageView.setImageBitmap(n[0][0]);
+                           }
+                       });
                     }
                 });
                 right.setOnClickListener(new View.OnClickListener() {
@@ -174,12 +214,18 @@ public class CustomCameraActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         Matrix mat = new Matrix();
                         mat.postRotate(90.0f);
-                        n[0] = Bitmap.createBitmap(n[0], 0, 0, n[0].getWidth(), n[0].getHeight(), mat, true);
-                        imageView.setImageBitmap(n[0]);
+                        n[0][0] = Bitmap.createBitmap(n[0][0], 0, 0, n[0][0].getWidth(), n[0][0].getHeight(), mat, true);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                imageView.setImageBitmap(n[0][0]);
+
+                            }
+                        });
                     }
                 });
             } catch (Exception e) {
-                Toast.makeText(CustomCameraActivity.this, "Failed To Save", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CustomCameraActivity.this, getString(R.string.failed_to_save), Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
                 setResult(RESULT_CANCELED);
             }

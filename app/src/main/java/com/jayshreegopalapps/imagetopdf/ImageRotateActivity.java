@@ -71,7 +71,7 @@ public class ImageRotateActivity extends AppCompatActivity {
             try {
                 FileOutputStream fos = new FileOutputStream(getExternalFilesDir(null) + "/" + fileName);
                 bMap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.done), Toast.LENGTH_SHORT).show();
                 Picasso.get().invalidate(getExternalFilesDir(null) + "/" + fileName);
                 finish();
             } catch (FileNotFoundException e) {

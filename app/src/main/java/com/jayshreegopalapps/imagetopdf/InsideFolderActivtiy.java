@@ -77,13 +77,13 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
     @Override
     public void save(String name, String newName) {
         if(name.equals("") || newName.equals("")) {
-            Toast.makeText(this, "Failed to rename", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.failed_to_rename), Toast.LENGTH_SHORT).show();
         }
         else{
             Cursor cursor = fileTable.customSelect("select count(*) from FileDetails where name = '" + newName + "'");
             if(cursor.moveToNext()) {
                 if(cursor.getInt(0) > 0) {
-                    Toast.makeText(this, "Folder already exist", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.folder_already_exist, Toast.LENGTH_SHORT).show();
                 }
                 else{
                     fileTable.customQuery("update FileDetails set name = '" + newName + "' where name = '" + name + "'");
@@ -324,6 +324,11 @@ public class InsideFolderActivtiy extends AppCompatActivity implements updateUIF
     @Override
     protected void onResume() {
         super.onResume();
+        LoadSettings.load(InsideFolderActivtiy.this);
+        LoadSettings.setViewTheme(fab, InsideFolderActivtiy.this);
+        LoadSettings.setViewTheme(fab2, InsideFolderActivtiy.this);
+        LoadSettings.setViewTheme(fab3, InsideFolderActivtiy.this);
+
         refreshPage();
         SharedPreferences prefs = getSharedPreferences("com.jayshreegopalapps.ImageToPdf", MODE_PRIVATE);
         if (prefs.getBoolean("insidefolder8", true)) {

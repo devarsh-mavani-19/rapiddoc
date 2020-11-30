@@ -38,6 +38,6 @@
         android:text="Page Number"
         android:textSize="12sp"
         android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold"></TextView>
+        android:textStyle="bold" />
 
 </RelativeLayout>

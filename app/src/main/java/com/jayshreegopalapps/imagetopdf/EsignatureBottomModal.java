@@ -78,7 +78,6 @@ public class EsignatureBottomModal extends BottomSheetDialogFragment {
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                Toast.makeText(context, "Signature Saved", Toast.LENGTH_SHORT).show();
             }
         });
 

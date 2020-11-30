@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingsActivity">
+
+<!--    <LinearLayout-->
+<!--        android:id="@+id/ll_settings_lang"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:weightSum="3"-->
+<!--        android:layout_height="wrap_content">-->
+
+<!--        <TextView-->
+<!--            android:layout_weight="1"-->
+<!--            android:padding="20dp"-->
+<!--            android:text="@string/language"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/textview_language"-->
+<!--            android:padding="20dp"-->
+<!--            android:layout_weight="2"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content" />-->
+
+<!--    </LinearLayout>-->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/ll_heading_settings"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/close_settings"
+            android:layout_gravity="center"
+            android:rotation="45"
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_add_black_24dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp" />
+
+        <TextView
+            android:text="@string/settings"
+            android:textColor="@color/colorAccent"
+            android:textSize="20sp"
+            android:fontFamily="@font/arbutusslabregular"
+            android:padding="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_settings_color"
+        android:layout_below="@+id/ll_heading_settings"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:weightSum="3"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:padding="20dp"
+            android:fontFamily="@font/arbutusslabregular"
+            android:text="@string/app_theme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/color_settings"
+            android:padding="20dp"
+            android:layout_margin="20dp"
+            android:background="@color/colorPrimary"
+            android:layout_weight="2"
+            android:layout_width="300dp"
+            android:layout_height="50dp" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ll_settings_drive"
+        android:orientation="horizontal"
+        android:layout_below="@+id/ll_settings_color"
+        android:layout_width="match_parent"
+        android:weightSum="3"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:padding="20dp"
+            android:fontFamily="@font/arbutusslabregular"
+            android:text="@string/google_drive_account"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/button_logout_settings"
+            android:text="@string/logout"
+            android:layout_weight="2"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/colorAccent"
+            android:layout_margin="10dp"
+            android:layout_width="300dp"
+            android:layout_height="50dp" />
+
+    </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_settings_language"
+                android:orientation="horizontal"
+                android:layout_below="@+id/ll_settings_drive"
+                android:layout_width="match_parent"
+                android:weightSum="3"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:padding="20dp"
+                    android:fontFamily="@font/arbutusslabregular"
+                    android:text="@string/language"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <Button
+                    android:id="@+id/language_change_button"
+                    android:text="@string/language"
+                    android:layout_weight="2"
+                    android:background="@color/colorPrimary"
+                    android:textColor="@color/colorAccent"
+                    android:layout_margin="10dp"
+                    android:layout_width="300dp"
+                    android:layout_height="50dp" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

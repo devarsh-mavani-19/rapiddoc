@@ -40,7 +40,7 @@ public class PasswordFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(password.getText().toString().equals("")) {
-                    password.setError("Please Enter Password");
+                    password.setError(getString(R.string.please_enter_password));
                 } else {
                     SharedPreferences preferences = getContext().getSharedPreferences("com.jayshreegopalapps.ImageToPdf", Context.MODE_PRIVATE);
                     String mPassword=  preferences.getString("password", "");
@@ -55,7 +55,7 @@ public class PasswordFragment extends Fragment {
                             manager.beginTransaction().replace(R.id.splash_fragment, new SplashFragment(), "splash_screen").commit();
                         }
                         else {
-                            password.setError("Invalid Password");
+                            password.setError(getString(R.string.invalid_password));
                         }
                     }
                 }

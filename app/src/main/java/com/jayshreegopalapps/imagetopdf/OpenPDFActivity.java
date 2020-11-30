@@ -8,14 +8,26 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
+import com.tom_roush.pdfbox.contentstream.PDContentStream;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.pdmodel.PDPageContentStream;
+import com.tom_roush.pdfbox.pdmodel.PDResources;
+import com.tom_roush.pdfbox.pdmodel.common.PDRectangle;
+import com.tom_roush.pdfbox.util.Matrix;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class OpenPDFActivity extends AppCompatActivity {
     PDFView pdfView;
     Uri pdf_location;
     PDDocument document;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LoadSettings.load(OpenPDFActivity.this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +36,7 @@ public class OpenPDFActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         pdf_location = getIntent().getData();
         if (!getIntent().getType().equals("application/pdf")) {
-            Toast.makeText(this, "Invalid File Format", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.invalid_format), Toast.LENGTH_SHORT).show();
             finish();
         }
         pdfView = findViewById(R.id.open_pdf_view);

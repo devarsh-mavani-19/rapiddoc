@@ -32,6 +32,16 @@ public class OCRActivity extends AppCompatActivity {
     private int REQUEST_GALLERY = 1;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        LoadSettings.load(OCRActivity.this);
+        LoadSettings.setViewTheme(btnCamera, OCRActivity.this);
+        LoadSettings.setViewTheme(btnGallery, OCRActivity.this);
+        LoadSettings.setViewTheme(btnExtract, OCRActivity.this);
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ocr);
@@ -52,7 +62,7 @@ public class OCRActivity extends AppCompatActivity {
                     extractText();
                 }
                 else{
-                    Toast.makeText(OCRActivity.this, "Please Select an Image", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OCRActivity.this, getString(R.string.select_image), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -76,7 +86,7 @@ public class OCRActivity extends AppCompatActivity {
     private void extractText() {
         TextRecognizer textRecognizer = new TextRecognizer.Builder(OCRActivity.this).build();
         if(!textRecognizer.isOperational()) {
-            Toast.makeText(this, "Could Not Get The Text", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.failed_to_get_text), Toast.LENGTH_SHORT).show();
         } else{
             Frame frame = new Frame.Builder().setBitmap(bitmap).build();
             SparseArray<TextBlock> items = textRecognizer.detect(frame);

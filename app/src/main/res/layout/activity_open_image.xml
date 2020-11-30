@@ -35,7 +35,7 @@ android:layout_marginStart="20dp"
             android:fontFamily="@font/arbutusslabregular"
 
             android:background="@color/colorPrimary"
-            android:text="save" />
+            android:text="@string/save" />
 
 
         <Button
@@ -67,7 +67,7 @@ android:layout_marginStart="20dp"
 
             android:background="@color/colorPrimary"
             android:layout_centerVertical="true"
-            android:text="cancel" />
+            android:text="@string/cancel" />
 
     </LinearLayout>
 

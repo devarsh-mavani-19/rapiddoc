@@ -48,7 +48,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:drawableTop="@drawable/ic_image"
-            android:text="Original"
+            android:text="@string/original"
             android:textSize="8sp"
             android:fontFamily="@font/arbutusslabregular"
             android:textColor="@android:color/white" />
@@ -63,7 +63,7 @@
             android:background="@android:color/transparent"
             android:drawableTop="@drawable/ic_enhamce_image"
             android:singleLine="true"
-            android:text="Magic color"
+            android:text="@string/magic_color"
             android:textColor="@android:color/white" />
 
         <Button

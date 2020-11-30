@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,17 +63,17 @@ public class SetPasswordActivity extends AppCompatActivity {
                         if(retypePassword.getText().toString().equals(password.getText().toString())) {
                             preferences.edit().putString("password" ,(password.getText().toString())).commit();
                             preferences.edit().putBoolean("isPasswordSet", true).commit();
-                            Toast.makeText(SetPasswordActivity.this, "Password Set Successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SetPasswordActivity.this, getString(R.string.password_set_successfuly), Toast.LENGTH_SHORT).show();
                             finish();
                         } else {
-                            Toast.makeText(SetPasswordActivity.this, "Passwords Do not match!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SetPasswordActivity.this, getString(R.string.password_do_not_match), Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case MODE_ASK_PASSWORD:
                         if(mPassword.equals(password.getText().toString())) {
                             setToDefaultMode();
                         } else {
-                            Toast.makeText(SetPasswordActivity.this, "Invalid Password", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SetPasswordActivity.this, getString(R.string.password_do_not_match), Toast.LENGTH_SHORT).show();
                         }
 
 
@@ -87,16 +88,16 @@ public class SetPasswordActivity extends AppCompatActivity {
         removePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog dialog = new AlertDialog.Builder(SetPasswordActivity.this).setTitle("Confirm Remove Password").setMessage("Are you sure you want to remove password?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                AlertDialog dialog = new AlertDialog.Builder(SetPasswordActivity.this).setTitle(getString(R.string.remove_password)).setMessage(getString(R.string.confirm_remove_password)).setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         preferences.edit().putString("password", "").commit();
                         preferences.edit().putBoolean("isPasswordSet", false).commit();
                         dialog.dismiss();
-                        Toast.makeText(SetPasswordActivity.this, "Password Removed", Toast.LENGTH_SHORT).show();
                         finish();
+                        Toast.makeText(SetPasswordActivity.this, getString(R.string.password_removed), Toast.LENGTH_SHORT).show();
                     }
-                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -112,6 +113,14 @@ public class SetPasswordActivity extends AppCompatActivity {
                 setToNewPasswordMode();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LoadSettings.load(SetPasswordActivity.this);
+        RelativeLayout rl= findViewById(R.id.rl_set_password_parent);
+        LoadSettings.setViewTheme(rl, SetPasswordActivity.this);
     }
 
     private void setToDefaultMode() {
@@ -137,7 +146,7 @@ public class SetPasswordActivity extends AppCompatActivity {
         mode = MODE_ASK_PASSWORD;
         status.setVisibility(View.VISIBLE);
         retypePassword.setVisibility(View.INVISIBLE);
-        status.setText("Enter Password");
+        status.setText(getString(R.string.enter_password));
         changePassword.setVisibility(View.INVISIBLE);
         removePassword.setVisibility(View.INVISIBLE);
         setPassword.setVisibility(View.VISIBLE);
@@ -149,7 +158,7 @@ public class SetPasswordActivity extends AppCompatActivity {
         retypePassword.setVisibility(View.VISIBLE);
         changePassword.setVisibility(View.INVISIBLE);
         status.setVisibility(View.VISIBLE);
-        status.setText("Enter Password");
+        status.setText(getString(R.string.enter_password));
         removePassword.setVisibility(View.INVISIBLE);
         setPassword.setVisibility(View.VISIBLE);
         password.setVisibility(View.VISIBLE);
